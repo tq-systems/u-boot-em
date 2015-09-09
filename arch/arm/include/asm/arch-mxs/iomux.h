@@ -16,8 +16,8 @@
 /*
  * IOMUX/PAD Bit field definitions
  *
- * PAD_BANK:		 0..2	(3)
- * PAD_PIN:		 3..7	(5)
+ * PAD_PIN:		 0..4	(5)
+ * PAD_BANK:		 5..7	(3)
  * PAD_MUXSEL:		 8..9	(2)
  * PAD_MA:		10..11	(2)
  * PAD_MA_VALID:	12	(1)
@@ -29,10 +29,10 @@
  */
 typedef u32 iomux_cfg_t;
 
-#define MXS_PAD_BANK_SHIFT	0
-#define MXS_PAD_BANK_MASK	((iomux_cfg_t)0x7 << MXS_PAD_BANK_SHIFT)
-#define MXS_PAD_PIN_SHIFT	3
+#define MXS_PAD_PIN_SHIFT	0
 #define MXS_PAD_PIN_MASK	((iomux_cfg_t)0x1f << MXS_PAD_PIN_SHIFT)
+#define MXS_PAD_BANK_SHIFT	5
+#define MXS_PAD_BANK_MASK	((iomux_cfg_t)0x7 << MXS_PAD_BANK_SHIFT)
 #define MXS_PAD_MUXSEL_SHIFT	8
 #define MXS_PAD_MUXSEL_MASK	((iomux_cfg_t)0x3 << MXS_PAD_MUXSEL_SHIFT)
 #define MXS_PAD_MA_SHIFT	10
