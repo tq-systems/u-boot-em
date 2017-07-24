@@ -1,0 +1,23 @@
+U-Boot on a EM300
+=================
+
+The EM300 (or Energymanager 300) uses a TQMa28L CPU board by TQ-Systems which is based on i.MX28 processor by Freescale.
+For further information please look at doc/README.mxs and doc/README.mxsimage.
+
+Contents:
+--------
+
+1) Compiling U-Boot for EM300
+
+
+1) Compiling U-Boot for EM300
+-----------------------------
+
+clean up:
+	$ make mrproper
+
+configure:
+	$ make em300_defconfig
+
+compile:
+	$ make u-boot.sb

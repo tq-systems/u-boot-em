@@ -1,0 +1,15 @@
+if TARGET_EM300
+
+config SYS_BOARD
+	default "em300"
+
+config SYS_VENDOR
+	default "tqs"
+
+config SYS_SOC
+	default "mxs"
+
+config SYS_CONFIG_NAME
+	default "em300"
+
+endif

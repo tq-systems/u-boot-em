@@ -1,0 +1,6 @@
+EM300 BOARD
+M:	Christoph Krutz <christoph.krutz@tq-group.com>
+S:	Maintained
+F:	board/tqs/em300/
+F:	include/configs/em300.h
+F:	configs/em300_defconfig
