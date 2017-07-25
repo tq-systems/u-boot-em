@@ -36,36 +36,31 @@ static unsigned int mxs_i2c_get_bus_speed(struct i2c_adapter *adap)
 {
 	struct mxs_i2c_regs *i2c_regs = mxs_i2c_get_base(adap);
 	uint32_t clk = mxc_get_clock(MXC_XTAL_CLK);
-	uint32_t timing0;
+	uint32_t timing0, timing1;
 
 	timing0 = readl(&i2c_regs->hw_i2c_timing0);
+	timing1 = readl(&i2c_regs->hw_i2c_timing1);
 	/*
 	 * This is a reverse version of the algorithm presented in
 	 * i2c_set_bus_speed(). Please refer there for details.
 	 */
-	return clk / ((((timing0 >> 16) - 3) * 2) + 38);
+	return (clk / ((timing0 >> 16) + (timing1 >> 16) + 11));
 }
 
 static uint mxs_i2c_set_bus_speed(struct i2c_adapter *adap, uint speed)
 {
 	struct mxs_i2c_regs *i2c_regs = mxs_i2c_get_base(adap);
 	/*
-	 * The timing derivation algorithm. There is no documentation for this
-	 * algorithm available, it was derived by using the scope and fiddling
-	 * with constants until the result observed on the scope was good enough
-	 * for 20kHz, 50kHz, 100kHz, 200kHz, 300kHz and 400kHz. It should be
-	 * possible to assume the algorithm works for other frequencies as well.
-	 *
 	 * Note it was necessary to cap the frequency on both ends as it's not
 	 * possible to configure completely arbitrary frequency for the I2C bus
 	 * clock.
 	 */
 	uint32_t clk = mxc_get_clock(MXC_XTAL_CLK);
-	uint32_t base = ((clk / speed) - 38) / 2;
-	uint16_t high_count = base + 3;
-	uint16_t low_count = base - 3;
-	uint16_t rcv_count = (high_count * 3) / 4;
-	uint16_t xmit_count = low_count / 4;
+	uint32_t div = (clk / speed);
+	uint16_t high_count = DIV_ROUND_UP(div, 2);
+	uint16_t low_count = (div / 2) - 11; /* MXS I2C core adds 11 clocks */
+	uint16_t rcv_count = div / 4;
+	uint16_t xmit_count = div / 4;
 
 	if (speed > 540000) {
 		printf("MXS I2C: Speed too high (%d Hz)\n", speed);
