@@ -45,7 +45,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 static u32 system_rev;
 static u32 system_ver;
-static uint16_t em310_emmc_dsr = 0x0100;
+static uint16_t tqma28l_emmc_dsr = 0x0100;
 
 #define SYSTEM_REV_OFFSET 0x8
 #define EM310REV0100      0x100
@@ -173,12 +173,12 @@ int board_mmc_init(bd_t *bis)
 	struct mmc *mmc;
 	int ret;
 
-	ret = mxsmmc_initialize(bis, CONFIG_SYS_MMC_ENV_DEV, NULL, em310_emmc_cd);
+	ret = mxsmmc_initialize(bis, 0, NULL, em310_emmc_cd);
 
 	mmc = find_mmc_device(CONFIG_SYS_MMC_ENV_DEV);
 	if (mmc) {
 		mmc->block_dev.removable = 0;
-		mmc_set_dsr(mmc, em310_emmc_dsr);
+		mmc_set_dsr(mmc, tqma28l_emmc_dsr);
 	}
 
 	return ret;
@@ -256,7 +256,7 @@ int misc_init_r(void)
 		putc('\n');
 	}
 
-	sprintf(buffer, "%d", em310_emmc_dsr);
+	sprintf(buffer, "%d", tqma28l_emmc_dsr);
 	setenv("tq_dsr", buffer);
 
 	return 0;

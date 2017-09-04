@@ -66,8 +66,8 @@ static uint32_t dram_vals[] = {
 	0x00000000, 0x00000000, 0x00000000, 0x01010000,
 	0x01000000, 0x03030000, 0x00010303, 0x01020202,
 	0x00000000, 0x02040303, 0x21002103, 0x00061200,
-	0x06120612, 0x04420442, 0x04420442, 0x00040004,
-	0x00040004, 0x00000000, 0x00000000, 0x00000000,
+	0x06120612, 0x04420442, 0x04420442, 0x00020002,
+	0x00020002, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0xffffffff
 
 /*
@@ -147,8 +147,8 @@ static void mxs_mem_init_clock(void)
 	/* Fractional divider for ref_emi is 33 ; 480 * 18 / 33 = 266MHz */
 	const unsigned char divider = 33;
 #elif defined(CONFIG_MX28)
-	/* Fractional divider for ref_emi is 21 ; 480 * 18 / 21 = 411MHz */
-	const unsigned char divider = 21;
+	/* Fractional divider for ref_emi is 22 ; 480 * 18 / 22 = 392MHz */
+	const unsigned char divider = 22;
 #endif
 
 	debug("SPL: Initialising FRAC0\n");
@@ -167,7 +167,7 @@ static void mxs_mem_init_clock(void)
 
 	early_delay(11000);
 
-	/* Set EMI clock divider for EMI clock to 411 / 2 = 205MHz */
+	/* Set EMI clock divider for EMI clock to 392 / 2 = 196MHz */
 	writel((2 << CLKCTRL_EMI_DIV_EMI_OFFSET) |
 		(1 << CLKCTRL_EMI_DIV_XTAL_OFFSET),
 		&clkctrl_regs->hw_clkctrl_emi);
@@ -222,7 +222,7 @@ static void mxs_mem_setup_vdda(void)
 	debug("SPL: Configuring VDDA\n");
 
 	writel((0xc << POWER_VDDACTRL_TRG_OFFSET) |
-		(0x7 << POWER_VDDACTRL_BO_OFFSET_OFFSET) |
+		(0x6 << POWER_VDDACTRL_BO_OFFSET_OFFSET) |
 		POWER_VDDACTRL_LINREG_OFFSET_1STEPS_BELOW,
 		&power_regs->hw_power_vddactrl);
 }

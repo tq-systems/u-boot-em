@@ -149,15 +149,19 @@ static void mxs_power_set_linreg(void)
  */
 static int mxs_get_batt_volt(void)
 {
-	struct mxs_power_regs *power_regs =
-		(struct mxs_power_regs *)MXS_POWER_BASE;
-	uint32_t volt = readl(&power_regs->hw_power_battmonitor);
-	volt &= POWER_BATTMONITOR_BATT_VAL_MASK;
-	volt >>= POWER_BATTMONITOR_BATT_VAL_OFFSET;
-	volt *= 8;
+	#if defined(CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE)
+		return 0;
+	#else
+		struct mxs_power_regs *power_regs =
+			(struct mxs_power_regs *)MXS_POWER_BASE;
+		uint32_t volt = readl(&power_regs->hw_power_battmonitor);
+		volt &= POWER_BATTMONITOR_BATT_VAL_MASK;
+		volt >>= POWER_BATTMONITOR_BATT_VAL_OFFSET;
+		volt *= 8;
 
-	debug("SPL: Battery Voltage = %dmV\n", volt);
-	return volt;
+		debug("SPL: Battery Voltage = %dmV\n", volt);
+		return volt;
+	#endif /* CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE */
 }
 
 /**
@@ -168,7 +172,11 @@ static int mxs_get_batt_volt(void)
  */
 static int mxs_is_batt_ready(void)
 {
-	return (mxs_get_batt_volt() >= 3600);
+	#if defined(CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE)
+		return 0;
+	#else
+		return (mxs_get_batt_volt() >= 3600);
+	#endif /* CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE */
 }
 
 /**
@@ -180,49 +188,53 @@ static int mxs_is_batt_ready(void)
  */
 static int mxs_is_batt_good(void)
 {
-	struct mxs_power_regs *power_regs =
-		(struct mxs_power_regs *)MXS_POWER_BASE;
-	uint32_t volt = mxs_get_batt_volt();
-
-	if ((volt >= 2400) && (volt <= 4300)) {
-		debug("SPL: Battery is good\n");
-		return 1;
-	}
-
-	clrsetbits_le32(&power_regs->hw_power_5vctrl,
-		POWER_5VCTRL_CHARGE_4P2_ILIMIT_MASK,
-		0x3 << POWER_5VCTRL_CHARGE_4P2_ILIMIT_OFFSET);
-	writel(POWER_5VCTRL_PWD_CHARGE_4P2_MASK,
-		&power_regs->hw_power_5vctrl_clr);
-
-	clrsetbits_le32(&power_regs->hw_power_charge,
-		POWER_CHARGE_STOP_ILIMIT_MASK | POWER_CHARGE_BATTCHRG_I_MASK,
-		POWER_CHARGE_STOP_ILIMIT_10MA | 0x3);
-
-	writel(POWER_CHARGE_PWD_BATTCHRG, &power_regs->hw_power_charge_clr);
-	writel(POWER_5VCTRL_PWD_CHARGE_4P2_MASK,
-		&power_regs->hw_power_5vctrl_clr);
-
-	early_delay(500000);
-
-	volt = mxs_get_batt_volt();
-
-	if (volt >= 3500) {
-		debug("SPL: Battery Voltage too high\n");
+	#if defined(CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE)
 		return 0;
-	}
+	#else
+		struct mxs_power_regs *power_regs =
+			(struct mxs_power_regs *)MXS_POWER_BASE;
+		uint32_t volt = mxs_get_batt_volt();
 
-	if (volt >= 2400) {
-		debug("SPL: Battery is good\n");
-		return 1;
-	}
+		if ((volt >= 2400) && (volt <= 4300)) {
+			debug("SPL: Battery is good\n");
+			return 1;
+		}
 
-	writel(POWER_CHARGE_STOP_ILIMIT_MASK | POWER_CHARGE_BATTCHRG_I_MASK,
-		&power_regs->hw_power_charge_clr);
-	writel(POWER_CHARGE_PWD_BATTCHRG, &power_regs->hw_power_charge_set);
+		clrsetbits_le32(&power_regs->hw_power_5vctrl,
+			POWER_5VCTRL_CHARGE_4P2_ILIMIT_MASK,
+			0x3 << POWER_5VCTRL_CHARGE_4P2_ILIMIT_OFFSET);
+		writel(POWER_5VCTRL_PWD_CHARGE_4P2_MASK,
+			&power_regs->hw_power_5vctrl_clr);
 
-	debug("SPL: Battery Voltage too low\n");
-	return 0;
+		clrsetbits_le32(&power_regs->hw_power_charge,
+			POWER_CHARGE_STOP_ILIMIT_MASK | POWER_CHARGE_BATTCHRG_I_MASK,
+			POWER_CHARGE_STOP_ILIMIT_10MA | 0x3);
+
+		writel(POWER_CHARGE_PWD_BATTCHRG, &power_regs->hw_power_charge_clr);
+		writel(POWER_5VCTRL_PWD_CHARGE_4P2_MASK,
+			&power_regs->hw_power_5vctrl_clr);
+
+		early_delay(500000);
+
+		volt = mxs_get_batt_volt();
+
+		if (volt >= 3500) {
+			debug("SPL: Battery Voltage too high\n");
+			return 0;
+		}
+
+		if (volt >= 2400) {
+			debug("SPL: Battery is good\n");
+			return 1;
+		}
+
+		writel(POWER_CHARGE_STOP_ILIMIT_MASK | POWER_CHARGE_BATTCHRG_I_MASK,
+			&power_regs->hw_power_charge_clr);
+		writel(POWER_CHARGE_PWD_BATTCHRG, &power_regs->hw_power_charge_set);
+
+		debug("SPL: Battery Voltage too low\n");
+		return 0;
+	#endif /* CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE */
 }
 
 /**
@@ -313,6 +325,12 @@ static void mxs_src_power_init(void)
 	clrsetbits_le32(&power_regs->hw_power_minpwr,
 			POWER_MINPWR_HALFFETS, POWER_MINPWR_DOUBLE_FETS);
 
+	/* imx-bootlets: mach-mx28/hw/power/src/hw_power_registers.c:
+	 *
+	 * DCDC_XFER is necessary when first powering on the DCDC
+	 * regardless if the source is 4p2 or battery
+	 */
+
 	/* 5V to battery handoff ... FIXME */
 	setbits_le32(&power_regs->hw_power_5vctrl, POWER_5VCTRL_DCDC_XFER);
 	early_delay(30);
@@ -343,7 +361,12 @@ static void mxs_power_init_4p2_params(void)
 
 	clrsetbits_le32(&power_regs->hw_power_dcdc4p2,
 		POWER_DCDC4P2_DROPOUT_CTRL_MASK,
-		DCDC4P2_DROPOUT_CONFIG);
+		DCDC4P2_DROPOUT_CONFIG |
+	#if defined(CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE)
+		POWER_DCDC4P2_DROPOUT_CTRL_SRC_4P2);
+	#else
+		POWER_DCDC4P2_DROPOUT_CTRL_SRC_SEL);
+	#endif /* CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE */
 
 	clrsetbits_le32(&power_regs->hw_power_5vctrl,
 		POWER_5VCTRL_CHARGE_4P2_ILIMIT_MASK,
@@ -1247,16 +1270,19 @@ void mxs_power_init(void)
 	mxs_power_set_linreg();
 	mxs_power_setup_5v_detect();
 
-	mxs_setup_batt_detect();
+	#if !defined(CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE)
+		mxs_setup_batt_detect();
+	#endif
 
 	mxs_power_configure_power_source();
 	mxs_enable_output_rail_protection();
 
-	debug("SPL: Setting VDDIO to 3V3 (brownout @ 3v15)\n");
-	mxs_power_set_vddx(&mxs_vddio_cfg, 3300, 3150);
+	debug("SPL: Setting VDDIO to 3V3 (brownout @ 3v)\n");
+	mxs_power_set_vddx(&mxs_vddio_cfg, 3300, 3000);
 
-	debug("SPL: Setting VDDD to 1V5 (brownout @ 1v315)\n");
-	mxs_power_set_vddx(&mxs_vddd_cfg, 1500, 1315);
+	debug("SPL: Setting VDDD to 1V55 (brownout @ 1v450)\n");
+	mxs_power_set_vddx(&mxs_vddd_cfg, 1550, 1450);
+
 #ifdef CONFIG_MX23
 	debug("SPL: Setting mx23 VDDMEM to 2V5 (brownout @ 1v7)\n");
 	mxs_power_set_vddx(&mxs_vddmem_cfg, 2500, 1700);
@@ -1267,6 +1293,19 @@ void mxs_power_init(void)
 		POWER_CTRL_DCDC4P2_BO_IRQ, &power_regs->hw_power_ctrl_clr);
 
 	writel(POWER_5VCTRL_PWDN_5VBRNOUT, &power_regs->hw_power_5vctrl_set);
+
+#if defined(CONFIG_SPL_MXS_NO_DCDC_BATT_SOURCE)
+	/* On i.MX28, a new bit has been added to allow automatic hardware
+	 * shutdown if VDD4P2 browns out.  If we permanently only have a VDD5V
+	 * source, we want to enable this bit.  For devices with dead batteries,
+	 * we could also temporarily set this bit until the kernel battery
+	 * charger sufficiently charges the battery but we won't do this for
+	 * now as the latest release kernel versions aren't aware of  it
+	 * and thus don't handle the proper setting/clearing of this bit.
+	 */
+	writel(0x8 << POWER_REFCTRL_VAG_VAL_OFFSET,
+		&power_regs->hw_power_refctrl_set);
+	#endif
 
 	early_delay(1000);
 }
