@@ -1,0 +1,23 @@
+U-Boot on a EM310
+=================
+
+The EM310 (or Energymanager 310) uses a TQMa28L CPU board by TQ-Systems which is based on i.MX28 processor by Freescale.
+For further information please look at doc/README.mxs and doc/README.mxsimage.
+
+Contents:
+--------
+
+1) Compiling U-Boot for EM310
+
+
+1) Compiling U-Boot for EM310
+-----------------------------
+
+clean up:
+	$ make mrproper
+
+configure:
+	$ make em310_defconfig
+
+compile:
+	$ make u-boot.sb

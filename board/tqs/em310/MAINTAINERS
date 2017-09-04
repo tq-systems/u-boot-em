@@ -1,0 +1,6 @@
+TQ SYSTEMS EM310
+M:	Christoph Krutz <christoph.krutz@tq-group.com>
+S:	Maintained
+F:	board/tqs/em310/
+F:	include/configs/em310.h
+F:	configs/em310_defconfig
