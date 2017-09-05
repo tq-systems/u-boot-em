@@ -232,7 +232,7 @@ int board_eth_init(bd_t *bis)
 		return ret;
 	}
 
-	dev = eth_get_dev_by_name("FEC");
+	dev = eth_get_dev_by_name("FEC0");
 	if (!dev) {
 		puts("FEC MXS: Unable to get FEC device entry\n");
 		return -EINVAL;
