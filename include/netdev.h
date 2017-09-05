@@ -144,6 +144,11 @@ int fec_probe(bd_t *bd, int dev_id, uint32_t base_addr,
  * Allow FEC to fine-tune MII configuration on boards which require this.
  */
 int fecmxc_register_mii_postcall(struct eth_device *dev, int (*cb)(int));
+
+/* Implements the Micrel SMI-protocol for writing to extended register set
+ * of Micrel switches (e.g. KSZ8863).
+ */
+int fecmxc_smi_write(struct eth_device *dev, uint8_t regAddr, uint16_t data);
 #endif
 
 #endif /* _NETDEV_H_ */
