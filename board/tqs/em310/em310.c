@@ -245,6 +245,13 @@ int board_eth_init(bd_t *bis)
 		return ret;
 	}
 
+	/* Change KSZ8863 RMII clock setting for no feedback to REFCLKI_3 */
+	ret = fecmxc_smi_write(dev, 0xC6, 0x0007);
+	if(ret) {
+		printf("FEC MXS: Unable to change KSZ8863 RMII clock settings\n");
+		return ret;
+	}
+
 	return ret;
 }
 
