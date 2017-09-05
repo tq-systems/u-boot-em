@@ -238,6 +238,13 @@ int board_eth_init(bd_t *bis)
 		return -EINVAL;
 	}
 
+	/* Set KSZ8863 driver strength to 8mA */
+	ret = fecmxc_smi_write(dev, 0x0E, 0xFA07);
+	if(ret) {
+		printf("FEC MXS: Unable to set KSZ8863 driver strength\n");
+		return ret;
+	}
+
 	return ret;
 }
 
