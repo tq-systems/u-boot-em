@@ -12,4 +12,10 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "em310"
 
+config SYS_MXS_VDD5V_ONLY
+	def_bool y
+
+config SPL_MXS_NO_DCDC_BATT_SOURCE
+	def_bool y
+
 endif
