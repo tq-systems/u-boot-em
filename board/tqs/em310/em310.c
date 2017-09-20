@@ -193,6 +193,34 @@ int mxs_eth_enable_clock_out(void)
 	return 0;
 }
 
+static int fecmxc_mii_postcall(int phy)
+{
+	struct eth_device *dev;
+	int ret;
+
+	dev = eth_get_dev_by_name("FEC0");
+	if (!dev) {
+		puts("FEC MXS: Unable to get FEC device entry\n");
+		return -EINVAL;
+	}
+
+	/* Set KSZ8863 driver strength to 8mA */
+	ret = fecmxc_smi_write(dev, 0x0E, 0xFA07);
+	if(ret) {
+		printf("FEC MXS: Unable to set KSZ8863 driver strength\n");
+		return ret;
+	}
+
+	/* Change KSZ8863 RMII clock setting for no feedback to REFCLKI_3 */
+	ret = fecmxc_smi_write(dev, 0xC6, 0x0007);
+	if(ret) {
+		printf("FEC MXS: Unable to change KSZ8863 RMII clock settings\n");
+		return ret;
+	}
+
+	return 0;
+}
+
 int board_eth_init(bd_t *bis)
 {
 	struct mxs_clkctrl_regs *clkctrl_regs =
@@ -242,17 +270,9 @@ int board_eth_init(bd_t *bis)
 		return -EINVAL;
 	}
 
-	/* Set KSZ8863 driver strength to 8mA */
-	ret = fecmxc_smi_write(dev, 0x0E, 0xFA07);
-	if(ret) {
-		printf("FEC MXS: Unable to set KSZ8863 driver strength\n");
-		return ret;
-	}
-
-	/* Change KSZ8863 RMII clock setting for no feedback to REFCLKI_3 */
-	ret = fecmxc_smi_write(dev, 0xC6, 0x0007);
-	if(ret) {
-		printf("FEC MXS: Unable to change KSZ8863 RMII clock settings\n");
+	ret = fecmxc_register_mii_postcall(dev, fecmxc_mii_postcall);
+	if (ret) {
+		printf("FEC MXS: Unable to register FEC0 mii postcall\n");
 		return ret;
 	}
 
