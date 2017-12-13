@@ -283,7 +283,6 @@ int board_eth_init(bd_t *bis)
 
 int misc_init_r(void)
 {
-	char buffer[16];
 	char *s = getenv("serial");
 
 	puts("Board: Energy Manager 310\n");
@@ -293,9 +292,6 @@ int misc_init_r(void)
 		puts(s);
 		putc('\n');
 	}
-
-	sprintf(buffer, "%d", tqma28l_emmc_dsr);
-	setenv("tq_dsr", buffer);
 
 	return 0;
 }
