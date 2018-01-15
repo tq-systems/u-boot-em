@@ -34,7 +34,7 @@
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 
 /* Environment */
-#define CONFIG_ENV_SIZE			(16 * 1024)
+#define CONFIG_ENV_SIZE			(256 * 1024)
 #define CONFIG_ENV_OVERWRITE
 
 /* Environment is in MMC */
