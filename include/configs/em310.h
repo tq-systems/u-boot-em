@@ -80,7 +80,7 @@
 	"erase_mbr=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0" \
 	"load_zimage=ext4load mmc ${mmcdev}:${mmcpart} ${loadaddr} /boot/${bootfile}\0" \
 	"load_dt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
-	"mmc_boot=echo Booting from mmc; bootz ${loadaddr} - ${fdtaddr}" \
+	"mmc_boot=echo Booting from mmc; bootz ${loadaddr} - ${fdtaddr} \0" \
 	"net_boot=echo Booting netconsole for production process \0" \
 	"set_bootsys=echo Setting booting system; " \
 		"setenv boot; " \
