@@ -85,16 +85,17 @@
 	"set_bootsys=echo Setting booting system; " \
 		"setenv boot; " \
 		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
-			"if test x${BOOT_SLOT} = x1; then " \
-				"if test ${BOOT_1_LEFT} -gt 0 && test -z ${boot}; then " \
+			"if test ! -n ${boot} && test x${BOOT_SLOT} = x1; then " \
+				"if test ${BOOT_1_LEFT} -gt 0; then " \
 					"setexpr BOOT_1_LEFT ${BOOT_1_LEFT} - 1; " \
 					"echo Found valid slot 1, ${BOOT_1_LEFT} attempts remaining; " \
 					"test ${mmcpart} = 2 || setenv mmcpart 2; " \
 					"test ${raucslot} = 1 || setenv raucslot 1; " \
 					"setenv boot try; " \
 				"fi; " \
-			"elif test x${BOOT_SLOT} = x2; then " \
-				"if test ${BOOT_2_LEFT} -gt 0 && test -z ${boot}; then " \
+			"fi; " \
+			"if test ! -n ${boot} && test x${BOOT_SLOT} = x2; then " \
+				"if test ${BOOT_2_LEFT} -gt 0 ; then " \
 					"setexpr BOOT_2_LEFT ${BOOT_2_LEFT} - 1; " \
 					"echo Found valid slot 2, ${BOOT_2_LEFT} attempts remaining; " \
 					"test ${mmcpart} = 3 || setenv mmcpart 3; " \
