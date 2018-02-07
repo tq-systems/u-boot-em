@@ -39,8 +39,10 @@
 
 /* Environment is in MMC */
 #if defined(CONFIG_CMD_MMC) && defined(CONFIG_ENV_IS_IN_MMC)
-#define CONFIG_ENV_OFFSET		(256 * 1024)
+#define CONFIG_ENV_OFFSET		(2 * 1024)
 #define CONFIG_SYS_MMC_ENV_DEV		0
+#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
+#define CONFIG_ENV_OFFSET_REDUND	(260 * 1024)
 #endif
 
 /* FEC Ethernet on SoC */
@@ -59,47 +61,70 @@
 
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"boot_fdt=try\0" \
 	"mmcdev=0\0" \
 	"mmcpart=2\0" \
 	"console_fsl=ttyAM0\0" \
 	"console_mainline=ttyAMA0\0" \
 	"fdtfile=imx28-em310.dtb\0" \
 	"fdtaddr=0x41000000\0" \
-	"miscargs=setenv bootargs ${bootargs} panic=1\0" \
-	"mmcargs=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} rw rootwait\0" \
-	"ttyargs=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
-	"erase_env=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 2 1\0" \
-	"erase_mmc=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0" \
-	"loadimage=ext4load mmc ${mmcdev}:${mmcpart} ${loadaddr} /boot/${bootfile}\0" \
-	"loadfdt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
-	"mmcboot=echo Booting from mmc ...; " \
-		"run miscargs mmcargs ttyargs; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if run loadfdt; then " \
-				"bootz ${loadaddr} - ${fdtaddr}; " \
-			"else " \
-				"if test ${boot_fdt} = try; then " \
-					"bootz; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
+	"raucslot=1\0" \
+	"BOOT_1_LEFT=3\0" \
+	"BOOT_2_LEFT=3\0" \
+	"BOOT_ORDER=1 2\0" \
+	"boot=try\0" \
+	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0 " \
+	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} " \
+		"rootfstype=ext4 rw rootwait\0" \
+	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
+	"erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 4 200\0" \
+	"erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 208 200\0" \
+	"erase_mbr=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0" \
+	"load_zimage=ext4load mmc ${mmcdev}:${mmcpart} ${loadaddr} /boot/${bootfile}\0" \
+	"load_dt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
+	"mmc_boot=echo Booting from mmc; bootz ${loadaddr} - ${fdtaddr} \0" \
+	"net_boot=echo Booting netconsole for production process \0" \
+	"set_bootsys=echo Setting booting system; " \
+		"setenv boot; " \
+		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
+			"if test ! -n ${boot} && test x${BOOT_SLOT} = x1; then " \
+				"if test ${BOOT_1_LEFT} -gt 0; then " \
+					"setexpr BOOT_1_LEFT ${BOOT_1_LEFT} - 1; " \
+					"echo Found valid slot 1, ${BOOT_1_LEFT} attempts remaining; " \
+					"test ${mmcpart} = 2 || setenv mmcpart 2; " \
+					"test ${raucslot} = 1 || setenv raucslot 1; " \
+					"setenv boot try; " \
 				"fi; " \
 			"fi; " \
-		"else " \
-			"bootz; " \
-		"fi;\0" \
-	"netboot=echo Booting netconsole for production process TODO...\0"
+			"if test ! -n ${boot} && test x${BOOT_SLOT} = x2; then " \
+				"if test ${BOOT_2_LEFT} -gt 0 ; then " \
+					"setexpr BOOT_2_LEFT ${BOOT_2_LEFT} - 1; " \
+					"echo Found valid slot 2, ${BOOT_2_LEFT} attempts remaining; " \
+					"test ${mmcpart} = 3 || setenv mmcpart 3; " \
+					"test ${raucslot} = 2 || setenv raucslot 2; " \
+					"setenv boot try; " \
+				"fi; " \
+			"fi; " \
+		"done; " \
+		"saveenv; " \
+		"if test ${BOOT_1_LEFT} -eq 0 && test ${BOOT_2_LEFT} -eq 0; then " \
+			"echo No boot tries left, resetting tries to 3; " \
+			"setenv BOOT_1_LEFT 3; setenv BOOT_2_LEFT 3; " \
+			"saveenv; reset; " \
+		"fi; \0"
 
 #define CONFIG_BOOTCOMMAND \
+	"run set_bootsys; run args_misc args_mmc args_tty; " \
 	"mmc dev ${mmcdev} ${mmcpart}; if mmc rescan; then " \
-		"if run loadimage; then " \
-			"run mmcboot; " \
+		"if run load_zimage && run load_dt; then " \
+			"echo Found zImage and DT; " \
+			"run mmc_boot; " \
 		"else " \
+			"echo No images found; " \
 			"run netboot; " \
 		"fi; " \
 	"else " \
-		"run netboot; " \
-	"fi;"
+		"run net_boot; " \
+	"fi; "
 
 /* The rest of the configuration is shared */
 #include <configs/mxs.h>
