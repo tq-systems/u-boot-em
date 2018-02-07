@@ -73,7 +73,8 @@
 	"BOOT_ORDER=1 2\0" \
 	"boot=try\0" \
 	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0 " \
-	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} rw rootwait\0" \
+	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} " \
+		"rootfstype=ext4 rw rootwait\0" \
 	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
 	"erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 4 200\0" \
 	"erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 208 200\0" \
