@@ -51,6 +51,11 @@
 #define CONFIG_MX28_FEC_MAC_IN_OCOTP
 #endif
 
+/* IP config for boot_net */
+#define CONFIG_IPADDR		192.168.9.100
+#define CONFIG_SERVERIP		192.168.9.133
+#define CONFIG_NETMASK		255.255.255.0
+
 /* File System */
 #define CONFIG_FS_EXT4
 
@@ -61,28 +66,40 @@
 
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"mmcdev=0\0" \
-	"mmcpart=2\0" \
-	"console_fsl=ttyAM0\0" \
-	"console_mainline=ttyAMA0\0" \
-	"fdtfile=imx28-em310.dtb\0" \
-	"fdtaddr=0x41000000\0" \
-	"raucslot=1\0" \
+	"boot=try\0" \
+	"bootdelay=1\0" \
 	"BOOT_1_LEFT=3\0" \
 	"BOOT_2_LEFT=3\0" \
 	"BOOT_ORDER=1 2\0" \
-	"boot=try\0" \
-	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0 " \
+	"console_fsl=ttyAM0\0" \
+	"console_mainline=ttyAMA0\0" \
+	"ethaddr=00:d0:93:00:00:00\0" \
+	"fdtaddr=0x41000000\0" \
+	"fdtfile=imx28-em310.dtb\0" \
+	"hwtype=em310\0" \
+	"mmcdev=0\0" \
+	"mmcpart=2\0" \
+	"raucslot=1\0" \
+	"rootpath=/srv/production/em310/nfsroot\0" \
+	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0" \
 	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} " \
 		"rootfstype=ext4 rw rootwait\0" \
+	"args_net=setenv bootargs ${bootargs} root=/dev/nfs rw nfsroot=${serverip}:${rootpath} " \
+		"ip=${ipaddr}:${serverip}:${serverip}:${netmask}:${hwtype}::off\0" \
 	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
+	"boot_kernel=bootz ${loadaddr} - ${fdtaddr}\0" \
+	"boot_net=if run load_tftp_kernel && run load_tftp_dt; then " \
+			"run args_tty args_net boot_kernel; " \
+		"else " \
+			"echo Could not load Kernel and DT via TFTP; " \
+		"fi\0" \
 	"erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 4 200\0" \
 	"erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 208 200\0" \
 	"erase_mbr=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 0 2\0" \
-	"load_zimage=ext4load mmc ${mmcdev}:${mmcpart} ${loadaddr} /boot/${bootfile}\0" \
-	"load_dt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
-	"mmc_boot=echo Booting from mmc; bootz ${loadaddr} - ${fdtaddr} \0" \
-	"net_boot=echo Booting netconsole for production process \0" \
+	"load_mmc_kernel=ext4load mmc ${mmcdev}:${mmcpart} ${loadaddr} /boot/${bootfile}\0" \
+	"load_mmc_dt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
+	"load_tftp_kernel=tftpboot ${loadaddr} ${serverip}:${hwtype}/${bootfile}\0" \
+	"load_tftp_dt=tftpboot ${fdtaddr} ${serverip}:${hwtype}/${fdtfile}\0" \
 	"set_bootsys=echo Setting booting system; " \
 		"setenv boot; " \
 		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
@@ -110,21 +127,21 @@
 			"echo No boot tries left, resetting tries to 3; " \
 			"setenv BOOT_1_LEFT 3; setenv BOOT_2_LEFT 3; " \
 			"saveenv; reset; " \
-		"fi; \0"
+		"fi\0"
 
 #define CONFIG_BOOTCOMMAND \
 	"run set_bootsys; run args_misc args_mmc args_tty; " \
 	"mmc dev ${mmcdev} ${mmcpart}; if mmc rescan; then " \
-		"if run load_zimage && run load_dt; then " \
+		"if run load_mmc_kernel && run load_mmc_dt; then " \
 			"echo Found zImage and DT; " \
-			"run mmc_boot; " \
+			"run args_misc args_mmc args_tty boot_kernel; " \
 		"else " \
 			"echo No images found; " \
-			"run netboot; " \
+			"run boot_net; " \
 		"fi; " \
 	"else " \
-		"run net_boot; " \
-	"fi; "
+		"run boot_net; " \
+	"fi"
 
 /* The rest of the configuration is shared */
 #include <configs/mxs.h>
