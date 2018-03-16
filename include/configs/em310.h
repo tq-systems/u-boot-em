@@ -66,7 +66,6 @@
 
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"boot=try\0" \
 	"bootdelay=1\0" \
 	"BOOT_1_LEFT=3\0" \
 	"BOOT_2_LEFT=3\0" \
@@ -88,10 +87,18 @@
 		"ip=${ipaddr}:${serverip}:${serverip}:${netmask}:${hwtype}::off\0" \
 	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
 	"boot_kernel=bootz ${loadaddr} - ${fdtaddr}\0" \
-	"boot_net=if run load_tftp_kernel && run load_tftp_dt; then " \
-			"run args_tty args_net boot_kernel; " \
+	"boot_mmc=if run load_mmc_kernel && run load_mmc_dt; then " \
+			"echo Loaded kernel and device tree from mmc; " \
+			"run args_misc args_mmc args_tty boot_kernel; " \
 		"else " \
-			"echo Could not load Kernel and DT via TFTP; " \
+			"echo Could not load kernel and device tree from mmc; " \
+			"run boot_net; " \
+		"fi\0" \
+	"boot_net=if run load_tftp_kernel && run load_tftp_dt; then " \
+			"echo Loaded kernel and device tree via tftp; " \
+			"run args_net args_tty boot_kernel; " \
+		"else " \
+			"echo Could not load kernel and device tree via tftp; " \
 		"fi\0" \
 	"erase_env1=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 4 200\0" \
 	"erase_env2=mw.b ${loadaddr} 0 512; mmc write ${loadaddr} 208 200\0" \
@@ -109,7 +116,7 @@
 					"echo Found valid slot 1, ${BOOT_1_LEFT} attempts remaining; " \
 					"test ${mmcpart} = 2 || setenv mmcpart 2; " \
 					"test ${raucslot} = 1 || setenv raucslot 1; " \
-					"setenv boot try; " \
+					"setenv boot 1; " \
 				"fi; " \
 			"fi; " \
 			"if test ! -n ${boot} && test x${BOOT_SLOT} = x2; then " \
@@ -118,10 +125,11 @@
 					"echo Found valid slot 2, ${BOOT_2_LEFT} attempts remaining; " \
 					"test ${mmcpart} = 3 || setenv mmcpart 3; " \
 					"test ${raucslot} = 2 || setenv raucslot 2; " \
-					"setenv boot try; " \
+					"setenv boot 1; " \
 				"fi; " \
 			"fi; " \
 		"done; " \
+		"setenv boot; " \
 		"saveenv; " \
 		"if test ${BOOT_1_LEFT} -eq 0 && test ${BOOT_2_LEFT} -eq 0; then " \
 			"echo No boot tries left, resetting tries to 3; " \
@@ -130,16 +138,13 @@
 		"fi\0"
 
 #define CONFIG_BOOTCOMMAND \
-	"run set_bootsys; run args_misc args_mmc args_tty; " \
-	"mmc dev ${mmcdev} ${mmcpart}; if mmc rescan; then " \
-		"if run load_mmc_kernel && run load_mmc_dt; then " \
-			"echo Found zImage and DT; " \
-			"run args_misc args_mmc args_tty boot_kernel; " \
-		"else " \
-			"echo No images found; " \
-			"run boot_net; " \
-		"fi; " \
+	"run set_bootsys; " \
+	"mmc dev ${mmcdev} ${mmcpart}; " \
+	"if mmc rescan; then " \
+		"echo Found mmc device; " \
+		"run boot_mmc; " \
 	"else " \
+		"echo No mmc device found; " \
 		"run boot_net; " \
 	"fi"
 
