@@ -93,7 +93,7 @@
 			"run args_misc args_mmc args_tty boot_kernel; " \
 		"else " \
 			"echo Could not load kernel and device tree from mmc; " \
-			"run boot_net; " \
+			"run args_nc; " \
 		"fi\0" \
 	"boot_net=if run load_tftp_kernel && run load_tftp_dt; then " \
 			"echo Loaded kernel and device tree via tftp; " \
