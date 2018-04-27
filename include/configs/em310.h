@@ -56,6 +56,9 @@
 #define CONFIG_SERVERIP		192.168.9.133
 #define CONFIG_NETMASK		255.255.255.0
 
+/* */
+#define CONFIG_NETCONSOLE
+
 /* File System */
 #define CONFIG_FS_EXT4
 
@@ -79,12 +82,10 @@
 	"mmcdev=0\0" \
 	"mmcpart=2\0" \
 	"raucslot=1\0" \
-	"rootpath=/srv/production/em310/nfsroot\0" \
 	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0" \
 	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} " \
 		"rootfstype=ext4 rw rootwait\0" \
-	"args_net=setenv bootargs ${bootargs} root=/dev/nfs rw nfsroot=${serverip}:${rootpath} " \
-		"ip=${ipaddr}:${serverip}:${serverip}:${netmask}:${hwtype}::off\0" \
+	"args_nc=setenv stderr nc; setenv stdout nc; setenv stdin nc; setenv ncip 192.168.9.133\0" \
 	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
 	"boot_kernel=bootz ${loadaddr} - ${fdtaddr}\0" \
 	"boot_mmc=if run load_mmc_kernel && run load_mmc_dt; then " \
@@ -96,7 +97,7 @@
 		"fi\0" \
 	"boot_net=if run load_tftp_kernel && run load_tftp_dt; then " \
 			"echo Loaded kernel and device tree via tftp; " \
-			"run args_net args_tty boot_kernel; " \
+			"run args_tty boot_kernel; " \
 		"else " \
 			"echo Could not load kernel and device tree via tftp; " \
 		"fi\0" \
@@ -144,8 +145,8 @@
 		"echo Found mmc device; " \
 		"run boot_mmc; " \
 	"else " \
-		"echo No mmc device found; " \
-		"run boot_net; " \
+		"echo No mmc device found, run netconsole; " \
+		"run args_nc; " \
 	"fi"
 
 /* The rest of the configuration is shared */
