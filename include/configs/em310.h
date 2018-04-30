@@ -85,7 +85,8 @@
 	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0" \
 	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} " \
 		"rootfstype=ext4 rw rootwait\0" \
-	"args_nc=setenv stderr nc; setenv stdout nc; setenv stdin nc; setenv ncip 192.168.9.133\0" \
+	"args_nc=run netconsole; setenv ncip 192.168.9.133\0" \
+	"args_nc_unset=run serialconsole; setenv ncip; saveenv\0" \
 	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
 	"boot_kernel=bootz ${loadaddr} - ${fdtaddr}\0" \
 	"boot_mmc=if run load_mmc_kernel && run load_mmc_dt; then " \
@@ -97,7 +98,7 @@
 		"fi\0" \
 	"boot_net=if run load_tftp_kernel && run load_tftp_dt; then " \
 			"echo Loaded kernel and device tree via tftp; " \
-			"run args_tty boot_kernel; " \
+			"run args_nc_unset args_tty boot_kernel; " \
 		"else " \
 			"echo Could not load kernel and device tree via tftp; " \
 		"fi\0" \
@@ -108,6 +109,8 @@
 	"load_mmc_dt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
 	"load_tftp_kernel=tftpboot ${loadaddr} ${serverip}:${hwtype}/${bootfile}\0" \
 	"load_tftp_dt=tftpboot ${fdtaddr} ${serverip}:${hwtype}/${fdtfile}\0" \
+	"netconsole=setenv stderr nc; setenv stdout nc; setenv stdin nc\0" \
+	"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial\0" \
 	"set_bootsys=echo Setting booting system; " \
 		"setenv boot; " \
 		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
