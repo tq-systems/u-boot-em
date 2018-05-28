@@ -84,7 +84,7 @@
 	"raucslot=1\0" \
 	"args_misc=setenv bootargs ${bootargs} rauc.slot=${raucslot} panic=1\0" \
 	"args_mmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p${mmcpart} " \
-		"rootfstype=ext4 rw rootwait\0" \
+		"rootfstype=ext4 ro rootwait\0" \
 	"args_nc=run netconsole; setenv ncip 192.168.9.133\0" \
 	"args_nc_unset=run serialconsole; setenv ncip; saveenv\0" \
 	"args_tty=setenv bootargs ${bootargs} console=${console_mainline},${baudrate}\0" \
