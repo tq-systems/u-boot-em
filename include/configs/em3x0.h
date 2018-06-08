@@ -107,7 +107,7 @@
 	"load_mmc_dt=ext4load mmc ${mmcdev}:${mmcpart} ${fdtaddr} /boot/${fdtfile}\0" \
 	"load_tftp_kernel=tftpboot ${loadaddr} ${serverip}:${hwtype}/${bootfile}\0" \
 	"load_tftp_dt=tftpboot ${fdtaddr} ${serverip}:${hwtype}/${fdtfile}\0" \
-	"netconsole=setenv stderr nc; setenv stdout nc; setenv stdin nc\0" \
+	"netconsole=echo Starting netconsole...; setenv stderr nc; setenv stdout nc; setenv stdin nc\0" \
 	"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial\0" \
 	"set_bootsys=echo Setting booting system; " \
 		"setenv boot; " \
