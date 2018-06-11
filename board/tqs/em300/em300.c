@@ -226,9 +226,13 @@ int board_eth_init(bd_t *bis)
 	int ret;
 
 	ret = cpu_eth_init(bis);
+	if (ret)
+		return ret;
 
 	/* select source for IEEE 1588 timer */
-	setbits_le32(&clkctrl_regs->hw_clkctrl_enet, CLKCTRL_ENET_TIME_SEL_RMII_CLK);
+	clrsetbits_le32(&clkctrl_regs->hw_clkctrl_enet,
+		CLKCTRL_ENET_TIME_SEL_MASK | CLKCTRL_ENET_CLK_OUT_EN,
+		CLKCTRL_ENET_TIME_SEL_RMII_CLK);
 
 	/*
 	 * Reset PHY
