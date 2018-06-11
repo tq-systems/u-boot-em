@@ -129,6 +129,8 @@ const iomux_cfg_t iomux_setup[] = {
 };
 
 #define HW_DRAM_CTL29	(0x74 >> 2)
+#define HW_DRAM_CTL183	(0x2dc >> 2)
+#define HW_DRAM_CTL184	(0x2e0 >> 2)
 #define CS_MAP		0xf
 #define COLUMN_SIZE	0x2
 #define ADDR_PINS	0x1
@@ -136,10 +138,15 @@ const iomux_cfg_t iomux_setup[] = {
 
 #define HW_DRAM_CTL29_CONFIG	(CS_MAP << 24 | COLUMN_SIZE << 16 | \
 					ADDR_PINS << 8 | APREBIT)
+/* TODO: More readable definitions of these magic numbers */
+#define HW_DRAM_CTL183_CONFIG	0x00040004
+#define HW_DRAM_CTL184_CONFIG	0x00040004
 
 void mxs_adjust_memory_params(uint32_t *dram_vals)
 {
 	dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG;
+	dram_vals[HW_DRAM_CTL183] = HW_DRAM_CTL183_CONFIG;
+	dram_vals[HW_DRAM_CTL184] = HW_DRAM_CTL184_CONFIG;
 }
 
 void board_init_ll(const uint32_t arg, const uint32_t *resptr)
