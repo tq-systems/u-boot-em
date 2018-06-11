@@ -49,15 +49,11 @@
 #ifdef	CONFIG_CMD_NET
 #define CONFIG_FEC_MXC
 #define CONFIG_MX28_FEC_MAC_IN_OCOTP
-#endif
-
-/* IP config for boot_net */
+#define CONFIG_NETCONSOLE
 #define CONFIG_IPADDR		192.168.9.100
 #define CONFIG_SERVERIP		192.168.9.133
 #define CONFIG_NETMASK		255.255.255.0
-
-/* */
-#define CONFIG_NETCONSOLE
+#endif
 
 /* File System */
 #define CONFIG_FS_EXT4
