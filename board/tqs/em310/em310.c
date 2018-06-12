@@ -45,7 +45,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 static u32 system_rev;
 static u32 system_ver;
-static uint16_t tqma28l_emmc_dsr = 0x0100;
 
 #define SYSTEM_REV_OFFSET 0x8
 #define EM310REV0100      0x100
@@ -178,7 +177,6 @@ int board_mmc_init(bd_t *bis)
 	mmc = find_mmc_device(CONFIG_SYS_MMC_ENV_DEV);
 	if (mmc) {
 		mmc->block_dev.removable = 0;
-		mmc_set_dsr(mmc, tqma28l_emmc_dsr);
 	}
 
 	return ret;
