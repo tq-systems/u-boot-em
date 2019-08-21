@@ -36,6 +36,7 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <linux/mii.h>
+#include <fdt_support.h>
 #include <miiphy.h>
 #include <netdev.h>
 #include <errno.h>
@@ -277,6 +278,15 @@ int board_eth_init(bd_t *bis)
 	return ret;
 }
 
+#endif
+
+#ifdef CONFIG_OF_BOARD_SETUP
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	do_fixup_by_path_u32(blob, "/", "tqs,revision", system_rev, 1);
+
+	return 0;
+}
 #endif
 
 int misc_init_r(void)
