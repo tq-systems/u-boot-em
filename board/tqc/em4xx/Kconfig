@@ -1,0 +1,87 @@
+if TARGET_IMX8MN_EM4XX
+
+config SYS_BOARD
+	default "em4xx"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "em4xx"
+
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8mn-em4xx-u"
+
+config DEFAULT_FDT_FILE
+	default "imx8mn-em4xx-u.dtb"
+
+config NR_DRAM_BANKS
+	default 1 
+
+config SYS_TEXT_BASE
+	default 0x40200000 
+
+config SYS_MALLOC_F_LEN
+	default 0x2000 
+
+config SAVED_DRAM_TIMING_BASE
+	default 0x40000000 
+
+config FIT_EXTERNAL_OFFSET
+	default 0x3000 
+
+config SPL_FIT_GENERATOR
+	default "arch/arm/mach-imx/mkimage_fit_atf.sh" 
+
+config SYS_EXTRA_OPTIONS
+	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x912000"
+
+config IMX8MN_EM4XX_DEFAULTS
+	bool
+	default y
+	select ARCH_MISC_INIT
+	select TQC_RTC
+	select TQC_SDMMC
+	select CMD_FUSE
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM
+	select DM_RTC
+	select DM_MMC
+	select MMC_IO_VOLTAGE
+	select MMC_HS400_SUPPORT
+	select FSL_ESDHC
+	select DM_THERMAL
+	select DM_SERIAL
+	select DM_PMIC
+	select MXC_UART
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
+	select MISC
+	select SPL
+	select SPL_LOAD_FIT
+	select SPL_BOARD_INIT
+	select SPL_ENV_SUPPORT
+	select SPL_SERIAL_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+	select ENV_IS_IN_MMC
+
+source "board/tqc/common/Kconfig"
+
+endif

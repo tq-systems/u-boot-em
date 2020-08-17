@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 TQ Systems GmbH
+ */
+
+#include "fsl-imx8mn-em4xx.dtsi"
+
+/ {
+	model = "TQ-Systems GmbH EM4XX-CB-L";
+};

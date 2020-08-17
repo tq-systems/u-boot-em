@@ -1,0 +1,188 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 TQ Systems GmbH
+ */
+
+/dts-v1/;
+
+#include "fsl-imx8mn.dtsi"
+
+/ {
+	compatible = "tq,imx8mn-em4xx", "fsl,imx8mn";
+
+	chosen {
+		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
+		stdout-path = &uart1;
+	};
+
+	reg_usdhc3_vmmc: regulator-vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_5v_usb: regulator-5v-usb {
+		compatible = "regulator-fixed";
+		regulator-name = "V_5V_USB";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_5v_usb>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>;
+	/*
+	Pad Control Register
+
+	| 0  | 0    | 0   | 0   | 0x   | 00x |
+	| PE | HYS  | PUE | ODE | FSEL | DSE |
+
+	PE: Pull Resistors Enable
+	HYS: Hysteresis Enable
+
+	PUE:
+	0 — Select pull-down resistors
+	1 — Select pull-up resistors
+
+	ODE: Open Drain Enable
+
+	FSEL:
+	0x - Select slow slew rate (SR=1)
+	1x — Select fast slew rate (SR=0)
+
+	DSE:
+	00x — Drive strength X1
+	10x — Drive strength X2
+	01x — Drive strength X4
+	11x — Drive strength X6
+
+	GPIO: 0x80 [HYS|slow|X1] (no pull up)
+	I2C: 0x400001C0 [SION|PE|HYS|PUE|slow|X1]
+	UART: 0x0 [slow|X1] (no pull up)
+	UDHC: 0x1D0 [PE|HYS|PUE|fast|X1]
+	UDHC100: 0x1D4 [PE|HYS|PUE|fast|x2]
+	UDHC200: 0x1D2 [PE|HYS|PUE|fast|x4]
+	*/
+
+	pinctrl_reg_5v_usb: reg5vusbgrp {
+		fsl,pins = <
+			/* PWR */
+			MX8MN_IOMUXC_GPIO1_IO12__GPIO1_IO12	0x80
+		>;
+	};
+
+	pinctrl_i2c1: i2c1grp {
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C1_SCL__I2C1_SCL		0x400001C0
+			MX8MN_IOMUXC_I2C1_SDA__I2C1_SDA		0x400001C0
+		>;
+	};
+
+	pinctrl_uart1: uart1grp {
+		fsl,pins = <
+			MX8MN_IOMUXC_UART1_RXD__UART1_DCE_RX	0x0
+			MX8MN_IOMUXC_UART1_TXD__UART1_DCE_TX	0x0
+		>;
+	};
+
+	pinctrl_usdhc3_gpio: usdhc3grpgpio {
+		fsl,pins = <
+			MX8MN_IOMUXC_SD2_CD_B__GPIO2_IO12	0x80
+		>;
+	};
+
+	pinctrl_usdhc3: usdhc3grp {
+		fsl,pins = <
+			MX8MN_IOMUXC_NAND_WE_B__USDHC3_CLK		0x1d0
+			MX8MN_IOMUXC_NAND_WP_B__USDHC3_CMD		0x1d0
+			MX8MN_IOMUXC_NAND_DATA04__USDHC3_DATA0		0x1d0
+			MX8MN_IOMUXC_NAND_DATA05__USDHC3_DATA1		0x1d0
+			MX8MN_IOMUXC_NAND_DATA06__USDHC3_DATA2		0x1d0
+			MX8MN_IOMUXC_NAND_DATA07__USDHC3_DATA3		0x1d0
+			MX8MN_IOMUXC_NAND_RE_B__USDHC3_DATA4		0x1d0
+			MX8MN_IOMUXC_NAND_CE2_B__USDHC3_DATA5		0x1d0
+			MX8MN_IOMUXC_NAND_CE3_B__USDHC3_DATA6		0x1d0
+			MX8MN_IOMUXC_NAND_CLE__USDHC3_DATA7		0x1d0
+			MX8MN_IOMUXC_NAND_CE1_B__USDHC3_STROBE 		0x80
+			MX8MN_IOMUXC_NAND_READY_B__USDHC3_RESET_B	0x80
+		>;
+	};
+
+	pinctrl_usdhc3_100mhz: usdhc3grp100mhz {
+		fsl,pins = <
+			MX8MN_IOMUXC_NAND_WE_B__USDHC3_CLK		0x1d4
+			MX8MN_IOMUXC_NAND_WP_B__USDHC3_CMD		0x1d4
+			MX8MN_IOMUXC_NAND_DATA04__USDHC3_DATA0		0x1d4
+			MX8MN_IOMUXC_NAND_DATA05__USDHC3_DATA1		0x1d4
+			MX8MN_IOMUXC_NAND_DATA06__USDHC3_DATA2		0x1d4
+			MX8MN_IOMUXC_NAND_DATA07__USDHC3_DATA3		0x1d4
+			MX8MN_IOMUXC_NAND_RE_B__USDHC3_DATA4		0x1d4
+			MX8MN_IOMUXC_NAND_CE2_B__USDHC3_DATA5		0x1d4
+			MX8MN_IOMUXC_NAND_CE3_B__USDHC3_DATA6		0x1d4
+			MX8MN_IOMUXC_NAND_CLE__USDHC3_DATA7		0x1d4
+			MX8MN_IOMUXC_NAND_CE1_B__USDHC3_STROBE 		0x80
+			MX8MN_IOMUXC_NAND_READY_B__USDHC3_RESET_B	0x80
+		>;
+	};
+
+	pinctrl_usdhc3_200mhz: usdhc3grp200mhz {
+		fsl,pins = <
+			MX8MN_IOMUXC_NAND_WE_B__USDHC3_CLK		0x1d2
+			MX8MN_IOMUXC_NAND_WP_B__USDHC3_CMD		0x1d2
+			MX8MN_IOMUXC_NAND_DATA04__USDHC3_DATA0		0x1d2
+			MX8MN_IOMUXC_NAND_DATA05__USDHC3_DATA1		0x1d2
+			MX8MN_IOMUXC_NAND_DATA06__USDHC3_DATA2		0x1d2
+			MX8MN_IOMUXC_NAND_DATA07__USDHC3_DATA3		0x1d2
+			MX8MN_IOMUXC_NAND_RE_B__USDHC3_DATA4		0x1d2
+			MX8MN_IOMUXC_NAND_CE2_B__USDHC3_DATA5		0x1d2
+			MX8MN_IOMUXC_NAND_CE3_B__USDHC3_DATA6		0x1d2
+			MX8MN_IOMUXC_NAND_CLE__USDHC3_DATA7		0x1d2
+			MX8MN_IOMUXC_NAND_CE1_B__USDHC3_STROBE 		0x80
+			MX8MN_IOMUXC_NAND_READY_B__USDHC3_RESET_B	0x80
+		>;
+	};
+
+	pinctrl_wdog: wdoggrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_GPIO1_IO02__WDOG1_WDOG_B		0x80
+		>;
+	};
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	status = "okay";
+
+	rtc0: rtc@51 {
+		compatible = "nxp,pcf85063tp";
+		reg = <0x51>;
+	};
+};
+
+/* console */
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	status = "okay";
+};
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc3>, <&pinctrl_usdhc3_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>, <&pinctrl_usdhc3_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>, <&pinctrl_usdhc3_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
+	disable-wp;
+	vmmc-supply = <&reg_usdhc3_vmmc>;
+	status = "okay";
+};

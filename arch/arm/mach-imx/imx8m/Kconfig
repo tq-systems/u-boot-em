@@ -102,6 +102,12 @@ config TARGET_TQMA8MXNL
 	select IMX8M_LPDDR4
 	select SUPPORT_SPL
 
+config TARGET_IMX8MN_EM4XX
+	bool "Support i.MX8MN on EM4XX-CB"
+	select IMX8MN
+	select IMX8M_LPDDR4
+	select SUPPORT_SPL
+
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
@@ -112,4 +118,6 @@ source "board/freescale/imx8mm_val/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
 source "board/tqc/tqma8mx/Kconfig"
 source "board/tqc/tqma8mxml/Kconfig"
+source "board/tqc/em4xx/Kconfig"
+
 endif

@@ -1,0 +1,13 @@
+TQ Systems GmbH em4xx Board
+M:	Martin Schmiedel <Martin.Schmiedel@tq-group.com>
+M:	Markus Niebel <Markus.Niebel@tq-group.com>
+S:	Maintained
+F:	board/tqc/em4xx/
+F:	include/configs/em4xx.h
+F:	include/configs/em4xx-mba8mx.h
+F:	configs/em4xx*_defconfig
+F:	configs/tqma8mnx*_defconfig
+F:	arch/arm/dts/*imx8mm-em4xx*.dtsi
+F:	arch/arm/dts/*imx8mm*-mba8mx*.dts
+F:	arch/arm/dts/*imx8mn-em4xx*.dtsi
+F:	arch/arm/dts/*imx8mn*-mba8mx*.dts
