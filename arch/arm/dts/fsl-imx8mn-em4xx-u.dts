@@ -23,3 +23,10 @@
 		};
 	};     
 };
+
+&usbotg1 {
+	dr_mode = "host";
+	vbus-supply = <&reg_5v_usb>;
+	disable-over-current;
+	status = "okay";
+};

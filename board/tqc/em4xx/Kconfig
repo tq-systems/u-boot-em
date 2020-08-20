@@ -90,16 +90,16 @@ config IMX8MN_EM4XX_DEFAULTS
 	select FEC_MXC
 	select PHYLIB
 	select PHY_FIXED
+	select USB
+	select DM_USB
+	select USB_EHCI_HCD
+	select MXC_USB_OTG_HACTIVE
 
 config IMX8MN_EM4XX_MFG_SUPPORT
 	bool "MFG Tool support"
-	select USB
-	select DM_USB
 	select USB_GADGET
 	select DM_USB_GADGET
 	select CI_UDC
-	select USB_EHCI_HCD
-	select MXC_USB_OTG_HACTIVE
 	select USB_FUNCTION_SDP
 	select USB_FUNCTION_FASTBOOT
 	select FASTBOOT_UUU_SUPPORT
