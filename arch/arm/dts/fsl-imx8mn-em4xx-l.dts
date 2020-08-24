@@ -8,3 +8,11 @@
 / {
 	model = "TQ-Systems GmbH EM4XX-CB-L";
 };
+
+&fec1 {
+	status = "okay";
+	fixedphy: fixed-link {
+		speed = <100>;
+		full-duplex;
+	};
+};

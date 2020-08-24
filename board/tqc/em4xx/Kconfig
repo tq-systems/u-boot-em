@@ -81,6 +81,15 @@ config IMX8MN_EM4XX_DEFAULTS
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
 	select ENV_IS_IN_MMC
+	select MII
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	select DM_ETH
+	select FEC_MXC
+	select PHYLIB
+	select PHY_FIXED
 
 config IMX8MN_EM4XX_MFG_SUPPORT
 	bool "MFG Tool support"

@@ -8,3 +8,18 @@
 / {
 	model = "TQ-Systems GmbH EM4XX-CB-U";
 };
+
+&fec1 {
+        status = "okay";
+        phy-handle = <&ethphy0>;
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <0>;
+		};
+	};     
+};

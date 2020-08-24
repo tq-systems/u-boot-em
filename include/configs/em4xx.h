@@ -10,6 +10,14 @@
 #include <asm/arch/imx-regs.h>
 #include "imx_env.h"
 
+
+/* ENET Config */
+/* ENET1 */
+#if defined(CONFIG_FEC_MXC)
+	#define CONFIG_ETHPRIME                 "FEC"
+	#define FEC_QUIRK_ENET_MAC
+#endif
+
 #if !defined(CONFIG_SPL_BUILD)
 #define CONFIG_DM_PCA953X
 #endif
