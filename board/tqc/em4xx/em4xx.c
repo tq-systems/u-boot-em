@@ -201,11 +201,16 @@ int print_bootinfo(void)
 void adjust_env(void)
 {
 	bool has_usb = gpio_get_value(HW_VER3_GPIO);
+	enum boot_device bt_dev = get_boot_device();
 
 	if (!has_usb)
 		env_set("fdt_file", "imx8mn-em4xx-l.dtb");
 	else
 		env_set("fdt_file", "imx8mn-em4xx-u.dtb");
+
+	/* disable autoboot in serial download mode*/
+	if (bt_dev == USB_BOOT)
+		env_set("bootdelay", "-1");
 }
 
 int board_late_init(void)
