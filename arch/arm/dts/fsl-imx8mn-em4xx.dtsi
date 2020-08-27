@@ -10,6 +10,12 @@
 / {
 	compatible = "tq,imx8mn-em4xx", "fsl,imx8mn";
 
+	aliases {
+		mmc0 = &usdhc3;
+		/delete-property/ mmc1;
+		/delete-property/ mmc2;
+	};
+
 	chosen {
 		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
 		stdout-path = &uart1;
