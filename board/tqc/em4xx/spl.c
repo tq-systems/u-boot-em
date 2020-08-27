@@ -159,10 +159,11 @@ void spl_board_init(void)
 #ifdef CONFIG_SPL_LOAD_FIT
 int board_fit_config_name_match(const char *name)
 {
-	if (gpio_get_value(HW_VER3_GPIO) && !strcmp(name, "fsl-imx8mn-em4xx-u")) {
+	bool has_usb = gpio_get_value(HW_VER3_GPIO);
+	if (has_usb && !strcmp(name, "fsl-imx8mn-em4xx-u")) {
 		debug("USB Version detected: load USB devicetree\n");
 		return 0;
-	} else if (!strcmp(name, "fsl-imx8mn-em4xx-l")) {
+	} else if (!has_usb && !strcmp(name, "fsl-imx8mn-em4xx-l")) {
 		debug("LAN Version detected: load LAN devicetree\n");
 		return 0;
 	} else
