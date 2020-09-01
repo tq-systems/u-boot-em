@@ -1467,6 +1467,11 @@ __weak void init_clk_usdhc(u32 index)
 {
 }
 
+__weak u32 fsl_esdhc_clk_index(struct udevice *dev)
+{
+	return dev->seq;
+}
+
 static int fsl_esdhc_probe(struct udevice *dev)
 {
 	struct mmc_uclass_priv *upriv = dev_get_uclass_priv(dev);
@@ -1600,9 +1605,11 @@ static int fsl_esdhc_probe(struct udevice *dev)
 
 		priv->sdhc_clk = clk_get_rate(&priv->per_clk);
 	} else {
-		init_clk_usdhc(dev->seq);
+		u32 index = fsl_esdhc_clk_index(dev);
 
-		priv->sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK + dev->seq);
+		init_clk_usdhc(index);
+
+		priv->sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK + index);
 		if (priv->sdhc_clk <= 0) {
 			dev_err(dev, "Unable to get clk for %s\n", dev->name);
 			return -EINVAL;

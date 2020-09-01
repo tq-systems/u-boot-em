@@ -254,6 +254,7 @@ u32 imx_get_fecclk(void);
 u32 imx_get_uartclk(void);
 int clock_init(void);
 void init_clk_usdhc(u32 index);
+u32 fsl_esdhc_clk_index(struct udevice *dev);
 void init_nand_clk(void);
 void init_uart_clk(u32 index);
 void init_usb_clk(void);
