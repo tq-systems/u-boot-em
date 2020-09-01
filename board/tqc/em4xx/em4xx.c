@@ -247,3 +247,9 @@ int board_mmc_get_env_dev(int devno)
 {
 	return 0;
 }
+
+u32 fsl_esdhc_clk_index(struct udevice *dev)
+{
+	/* We only have a single SDHC controller */
+	return 2;
+}
