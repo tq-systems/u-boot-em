@@ -83,7 +83,7 @@ static void swap_packet(uint32_t *packet, int length)
 
 #ifndef CONFIG_PHYLIB
 /* SMI-interface related functions */
-int fecmxc_smi_write(struct eth_device *dev, uint8_t regAddr, uint16_t data)
+int fecmxc_smi_write(struct eth_device *dev, uint8_t regAddr, uint8_t data)
 {
 	struct fec_priv *fec = (struct fec_priv *)dev->priv;
 	struct ethernet_regs *eth = fec->bus->priv;

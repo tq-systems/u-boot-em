@@ -204,14 +204,14 @@ static int fecmxc_mii_postcall(int phy)
 	}
 
 	/* Set KSZ8863 driver strength to 8mA */
-	ret = fecmxc_smi_write(dev, 0x0E, 0xFA07);
+	ret = fecmxc_smi_write(dev, 0x0E, 0x07);
 	if(ret) {
 		printf("FEC MXS: Unable to set KSZ8863 driver strength\n");
 		return ret;
 	}
 
 	/* Change KSZ8863 RMII clock setting for no feedback to REFCLKI_3 */
-	ret = fecmxc_smi_write(dev, 0xC6, 0x0007);
+	ret = fecmxc_smi_write(dev, 0xC6, 0x07);
 	if(ret) {
 		printf("FEC MXS: Unable to change KSZ8863 RMII clock settings\n");
 		return ret;
