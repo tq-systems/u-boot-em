@@ -210,8 +210,8 @@ static int fecmxc_mii_postcall(int phy)
 		return ret;
 	}
 
-	/* Change KSZ8863 RMII clock setting for no feedback to REFCLKI_3 */
-	ret = fecmxc_smi_write(dev, 0xC6, 0x07);
+	/* Change KSZ8863 to use internal source for RMII clock */
+	ret = fecmxc_smi_write(dev, 0xC6, 0x0B);
 	if(ret) {
 		printf("FEC MXS: Unable to change KSZ8863 RMII clock settings\n");
 		return ret;
