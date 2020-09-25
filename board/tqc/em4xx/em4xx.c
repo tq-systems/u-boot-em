@@ -74,6 +74,7 @@ enum {
 	LED3_RD,
 	INT_5V_N,
 	FACTORY_DFLT_N,
+	USB_EN,
 };
 
 static struct tqc_gpio_init_data em4xx_gid[] = {
@@ -96,6 +97,8 @@ static struct tqc_gpio_init_data em4xx_gid[] = {
 
 	GPIO_INIT_DATA_ENTRY(INT_5V_N, "GPIO5_0", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(FACTORY_DFLT_N, "GPIO4_31", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(USB_EN, "GPIO1_12", GPIOD_IS_OUT),
 };
 
 void print_hw_info(void)
