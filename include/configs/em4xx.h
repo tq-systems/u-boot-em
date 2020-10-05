@@ -92,54 +92,68 @@
 
 /* Initial environment variables */
 #define EM4XX_ENV_SETTINGS		\
-	"script=boot.scr\0" \
 	"image=Image\0" \
 	"fdt_addr=0x43000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
-	"boot_fdt=try\0" \
 	"initrd_addr=0x43800000\0"		\
 	"initrd_high=0xffffffffffffffff\0" \
+	"BOOT_1_LEFT=3\0" \
+	"BOOT_2_LEFT=3\0" \
+	"BOOT_ORDER=1 2\0" \
+	"raucslot=1\0" \
+	"set_bootsys=echo Setting booting system; " \
+		"setenv boot; " \
+		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
+			"if test ! -n ${boot} && test x${BOOT_SLOT} = x1; then " \
+				"if test ${BOOT_1_LEFT} -gt 0; then " \
+					"setexpr BOOT_1_LEFT ${BOOT_1_LEFT} - 1; " \
+					"echo Found valid slot 1, ${BOOT_1_LEFT} attempts remaining; " \
+					"test ${mmcpart} = 2 || setenv mmcpart 2; " \
+					"test ${raucslot} = 1 || setenv raucslot 1; " \
+					"setenv boot 1; " \
+				"fi; " \
+			"fi; " \
+			"if test ! -n ${boot} && test x${BOOT_SLOT} = x2; then " \
+				"if test ${BOOT_2_LEFT} -gt 0 ; then " \
+					"setexpr BOOT_2_LEFT ${BOOT_2_LEFT} - 1; " \
+					"echo Found valid slot 2, ${BOOT_2_LEFT} attempts remaining; " \
+					"test ${mmcpart} = 3 || setenv mmcpart 3; " \
+					"test ${raucslot} = 2 || setenv raucslot 2; " \
+					"setenv boot 1; " \
+				"fi; " \
+			"fi; " \
+		"done; " \
+		"setenv boot; " \
+		"saveenv; " \
+		"if test ${BOOT_1_LEFT} -eq 0 && test ${BOOT_2_LEFT} -eq 0; then " \
+			"echo No boot tries left, resetting tries to 3; " \
+			"setenv BOOT_1_LEFT 3; setenv BOOT_2_LEFT 3; " \
+			"saveenv; reset; " \
+		"fi\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcautodetect=yes\0" \
-	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
-	"bootscript=echo Running bootscript from mmc ...; " \
-		"source\0" \
-	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
-	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} boot/${image}\0" \
+	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"setenv bootargs; " \
 		"run mmcargs; " \
 		"run loadimage; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if run loadfdt; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"echo WARN: Cannot load the DT; " \
-			"fi; " \
-		"else " \
-			"echo wait for boot; " \
-		"fi;\0" \
+		"run loadfdt;" \
+		"booti ${loadaddr} - ${fdt_addr}\0" \
 	"netboot=echo Booting from net ...; " \
 		"setenv bootargs; " \
 		"run netargs;  " \
 		"run set_getcmd; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"echo WARN: Cannot load the DT; " \
-			"fi; " \
-		"else " \
-			"booti; " \
-		"fi;\0" \
+		"${get_cmd} ${fdt_addr} ${fdt_file}; " \
+		"booti ${loadaddr} - ${fdt_addr}\0" \
 	"update_kernel=run set_getcmd; "                                       \
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
-					"${image} ${filesize}; "               \
+					"boot/${image} ${filesize}; "               \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
@@ -148,7 +162,7 @@
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
-					"${fdt_file} ${filesize}; "            \
+					"boot/${fdt_file} ${filesize}; "            \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
@@ -174,10 +188,9 @@
 		"fi; \0"                                                       \
 	"rootfsmode=ro\0"                                                      \
 	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
-	"mmcrootpart=2\0"                                                      \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
-		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
-		"rootwait\0"                                                   \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} ${rootfsmode} "       \
+		"rootwait rauc.slot=${raucslot}\0"                             \
 	"mmcargs=run addtty addmmc\0"                                          \
 	"netargs=run addnfs addip addtty\0"                                    \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
@@ -192,20 +205,6 @@
 	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
 	"addip=if test \"${ipmode}\" != static; then "                         \
 		"run addip_dynamic; else run addip_static; fi\0"
-
-#if !defined(CONFIG_BOOTCOMMAND)
-#define CONFIG_BOOTCOMMAND \
-	   "mmc dev ${mmcdev}; if mmc rescan; then " \
-		   "if run loadbootscript; then " \
-			   "run bootscript; " \
-		   "else " \
-			   "if run loadimage; then " \
-				   "run mmcboot; " \
-			   "else run netboot; " \
-			   "fi; " \
-		   "fi; " \
-	   "else booti ${loadaddr} - ${fdt_addr}; fi"
-#endif
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
