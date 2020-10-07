@@ -53,6 +53,23 @@ cat << __HEADER_EOF
 	description = "Configuration to load ATF before U-Boot";
 
 	images {
+__HEADER_EOF
+
+cnt=1
+for dtname in $*
+do
+	cat << __FDT_IMAGE_EOF
+		fdt@$cnt {
+			description = "$(basename $dtname .dtb)";
+			data = /incbin/("$dtname");
+			type = "flat_dt";
+			compression = "none";
+		};
+__FDT_IMAGE_EOF
+cnt=$((cnt+1))
+done
+
+cat << __HEADER_EOF
 		uboot@1 {
 			description = "U-Boot (64-bit)";
 			data = /incbin/("$BL33");
@@ -85,20 +102,6 @@ cat << __HEADER_EOF
 		};
 __HEADER_EOF
 fi
-
-cnt=1
-for dtname in $*
-do
-	cat << __FDT_IMAGE_EOF
-		fdt@$cnt {
-			description = "$(basename $dtname .dtb)";
-			data = /incbin/("$dtname");
-			type = "flat_dt";
-			compression = "none";
-		};
-__FDT_IMAGE_EOF
-cnt=$((cnt+1))
-done
 
 cat << __CONF_HEADER_EOF
 	};
