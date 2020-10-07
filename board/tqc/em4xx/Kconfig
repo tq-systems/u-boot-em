@@ -34,7 +34,7 @@ config SPL_FIT_GENERATOR
 	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
 
 config SYS_EXTRA_OPTIONS
-	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x912000"
+	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage-8mn-lpddr4.cfg,SPL_TEXT_BASE=0x912000"
 
 config IMX8MN_EM4XX_DEFAULTS
 	bool
