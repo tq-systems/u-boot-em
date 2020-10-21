@@ -44,6 +44,10 @@
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #define CONFIG_SYS_UBOOT_BASE		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
 
+#define CONFIG_IPADDR           192.168.9.100
+#define CONFIG_SERVERIP         192.168.9.133
+#define CONFIG_NETMASK          255.255.255.0
+
 #ifdef CONFIG_SPL_BUILD
 /*#define CONFIG_ENABLE_DDR_TRAINING_DEBUG*/
 #define CONFIG_SPL_WATCHDOG_SUPPORT
@@ -196,6 +200,11 @@
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
+	"netconsole=echo Starting netconsole...; "                             \
+		"setenv stderr nc; setenv stdout nc; setenv stdin nc; "        \
+		"setenv ncip ${serverip}\0"                                    \
+	"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial; " \
+		"setenv ncip\0"                                                \
 	"rootpath=/srv/nfs\0"                                                  \
 	"netdev=eth0\0"                                                        \
 	"ipmode=static\0"                                                      \
