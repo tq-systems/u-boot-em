@@ -224,3 +224,19 @@ void board_boot_order(u32 *spl_boot_list)
 		spl_boot_list[0] = spl_boot_device();
 	}
 }
+
+#ifdef CONFIG_SPL_MMC_SUPPORT
+
+#define UBOOT_RAW_SECTOR_OFFSET 0x40
+unsigned long spl_mmc_get_uboot_raw_sector(struct mmc *mmc)
+{
+	int part = (mmc->part_config >> 3) & PART_ACCESS_MASK;
+
+	if (part == 1 || part == 2)
+		return CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR -
+			UBOOT_RAW_SECTOR_OFFSET;
+
+	return CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR;
+}
+
+#endif
