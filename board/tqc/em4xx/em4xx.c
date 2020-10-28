@@ -230,7 +230,7 @@ int board_late_init(void)
 	/* set quartz load to 12500 femtofarads */
 	tqc_pcf85063_adjust_capacity(0, 0x51, 12500);
 	tqc_pcf85063_set_clkout(0, 0x51, TQC_PCF85063_CLKOUT_OFF);
-	tqc_pcf85063_set_offset(0, 0x51, true, 3);
+	tqc_pcf85063_set_offset(0, 0x51, true, 5);
 #endif
 
 
