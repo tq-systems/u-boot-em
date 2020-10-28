@@ -16,6 +16,7 @@
 #include <asm-generic/gpio.h>
 #include <fsl_esdhc.h>
 #include <mmc.h>
+#include <netdev.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
@@ -201,12 +202,21 @@ int print_bootinfo(void)
 	return 0;
 }
 
+static bool has_usb(void)
+{
+	static int ret = -1;
+
+	if (ret == -1)
+		ret = gpio_get_value(HW_VER3_GPIO);
+
+	return ret;
+}
+
 void adjust_env(void)
 {
-	bool has_usb = gpio_get_value(HW_VER3_GPIO);
 	enum boot_device bt_dev = get_boot_device();
 
-	if (!has_usb)
+	if (!has_usb())
 		env_set("fdt_file", "imx8mn-em4xx-l.dtb");
 	else
 		env_set("fdt_file", "imx8mn-em4xx-u.dtb");
@@ -214,6 +224,31 @@ void adjust_env(void)
 	/* disable autoboot in serial download mode*/
 	if (bt_dev == USB_BOOT)
 		env_set("bootdelay", "-1");
+}
+
+int board_phy_config(struct phy_device *phydev)
+{
+	int ret;
+
+	/* No switch in USB variant */
+	if (has_usb())
+		return 0;
+
+	/* Set KSZ8863 driver strength to 8mA */
+	ret = fec_smi_write(phydev, 0x0E, 0x07);
+	if (ret) {
+		printf("FEC MXS: Unable to set KSZ8863 driver strength\n");
+		return ret;
+	}
+
+	/* Change KSZ8863 to use internal source for RMII clock */
+	ret = fec_smi_write(phydev, 0xC6, 0x0B);
+	if (ret) {
+		printf("FEC MXS: Unable to change KSZ8863 RMII clock settings\n");
+		return ret;
+	}
+
+	return 0;
 }
 
 int board_late_init(void)
