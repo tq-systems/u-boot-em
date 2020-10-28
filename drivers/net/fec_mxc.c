@@ -217,6 +217,36 @@ static int fec_mdio_write(struct ethernet_regs *eth, uint8_t phyaddr,
 	return 0;
 }
 
+#ifdef CONFIG_PHYLIB
+/* SMI-interface related functions */
+int fec_smi_write(struct phy_device *phydev, uint8_t regaddr, uint8_t data)
+{
+	struct ethernet_regs *eth;
+	uint32_t reg;		/* convenient holder for the PHY register */
+	uint32_t start;
+
+	eth = phydev->bus->priv;
+	reg = regaddr << FEC_MII_DATA_RA_SHIFT;
+
+	writel(FEC_MII_DATA_ST | FEC_MII_DATA_OP_SMI | FEC_MII_DATA_TA | reg | data, &eth->mii_data);
+
+	/* wait for the MII interrupt */
+	start = get_timer(0);
+	while (!(readl(&eth->ievent) & FEC_IEVENT_MII)) {
+		if (get_timer(start) > (CONFIG_SYS_HZ / 1000)) {
+			printf("Write SMI failed...\n");
+			return -1;
+		}
+	}
+
+	/* clear MII interrupt bit */
+	writel(FEC_IEVENT_MII, &eth->ievent);
+	debug("%s: reg:%02x val:%#x\n", __func__, regaddr, data);
+
+	return 0;
+}
+#endif
+
 static int fec_phy_read(struct mii_dev *bus, int phyaddr, int dev_addr,
 			int regaddr)
 {

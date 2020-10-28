@@ -119,6 +119,11 @@ struct mii_dev *fec_get_miibus(ulong base_addr, int dev_id);
 struct phy_device;
 int fec_probe(bd_t *bd, int dev_id, uint32_t base_addr,
 		struct mii_dev *bus, struct phy_device *phydev);
+
+/* Implements the Micrel SMI-protocol for writing to extended register set
+ * of Micrel switches (e.g. KSZ8863).
+ */
+int fec_smi_write(struct phy_device *phydev, uint8_t regaddr, uint8_t data);
 #else
 /*
  * Allow FEC to fine-tune MII configuration on boards which require this.

@@ -316,6 +316,7 @@ void imx_get_mac_from_fuse(int dev_id, unsigned char *mac);
 #define FEC_MII_DATA_ST		0x40000000	/* Start of frame delimiter */
 #define FEC_MII_DATA_OP_RD	0x20000000	/* Perform a read operation */
 #define FEC_MII_DATA_OP_WR	0x10000000	/* Perform a write operation */
+#define FEC_MII_DATA_OP_SMI	0x00000000	/* Perform an SMI operation */
 #define FEC_MII_DATA_PA_MSK	0x0f800000	/* PHY Address field mask */
 #define FEC_MII_DATA_RA_MSK	0x007c0000	/* PHY Register field mask */
 #define FEC_MII_DATA_TA		0x00020000	/* Turnaround */
