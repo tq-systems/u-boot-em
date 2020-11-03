@@ -96,6 +96,7 @@
 
 /* Initial environment variables */
 #define EM4XX_ENV_SETTINGS \
+	"hwtype=em4xx\0" \
 	"image=Image.gz\0" \
 	"fdt_addr=0x43000000\0" \
 	"fdt_high=0xffffffffffffffff\0" \
@@ -145,13 +146,14 @@
 		"run unzipimage && " \
 		"run loadfdt && " \
 		"booti ${loadaddr} - ${fdt_addr}\0" \
-	"netboot=echo Booting from net ...; " \
+	"boot_net=echo Booting from net ...; " \
 		"setenv bootargs; " \
 		"run netargs;  " \
 		"run set_getcmd; " \
-		"${get_cmd} ${fdt_addr} ${image} && " \
-		"run unzipimage &&" \
-		"${get_cmd} ${fdt_addr} ${fdt_file} && " \
+		"${get_cmd} ${fdt_addr} ${hwtype}/${image} && " \
+		"run unzipimage && " \
+		"${get_cmd} ${fdt_addr} ${hwtype}/${fdt_file} && " \
+		"echo 'Loaded kernel and device tree via tftp' && " \
 		"booti ${loadaddr} - ${fdt_addr}\0" \
 	"update_kernel=run set_getcmd; "                                       \
 		"if ${get_cmd} ${image}; then "                                \
@@ -197,24 +199,14 @@
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} ${rootfsmode} "       \
 		"rootwait rauc.slot=${raucslot}\0"                             \
 	"mmcargs=run addtty addmmc\0"                                          \
-	"netargs=run addnfs addip addtty\0"                                    \
-	"addnfs=setenv bootargs ${bootargs} "                                  \
-		"root=/dev/nfs rw "                                            \
-		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
+	"netargs=run addtty\0"                                    \
 	"netconsole=echo Starting netconsole...; "                             \
-		"setenv stderr nc; setenv stdout nc; setenv stdin nc; "        \
-		"setenv ncip ${serverip}\0"                                    \
+		"setenv ncip ${serverip}; "                                    \
+		"setenv stderr nc; setenv stdout nc; setenv stdin nc\0"        \
 	"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial; " \
 		"setenv ncip\0"                                                \
-	"rootpath=/srv/nfs\0"                                                  \
-	"netdev=eth0\0"                                                        \
 	"ipmode=static\0"                                                      \
-	"addip_static=setenv bootargs ${bootargs} "                            \
-		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
-		"${hostname}:${netdev}:off\0"                                  \
-	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
-	"addip=if test \"${ipmode}\" != static; then "                         \
-		"run addip_dynamic; else run addip_static; fi\0"
+	""
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
