@@ -95,12 +95,10 @@
 #undef CONFIG_BOOTM_NETBSD
 
 /* Initial environment variables */
-#define EM4XX_ENV_SETTINGS		\
-	"image=Image\0" \
-	"fdt_addr=0x43000000\0"			\
-	"fdt_high=0xffffffffffffffff\0"		\
-	"initrd_addr=0x43800000\0"		\
-	"initrd_high=0xffffffffffffffff\0" \
+#define EM4XX_ENV_SETTINGS \
+	"image=Image.gz\0" \
+	"fdt_addr=0x43000000\0" \
+	"fdt_high=0xffffffffffffffff\0" \
 	"BOOT_1_LEFT=3\0" \
 	"BOOT_2_LEFT=3\0" \
 	"BOOT_ORDER=1 2\0" \
@@ -137,20 +135,23 @@
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcautodetect=yes\0" \
-	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} boot/${image}\0" \
+	"unzipimage=unzip ${fdt_addr} ${loadaddr}\0" \
+	"loadimage=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${image}\0" \
 	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"setenv bootargs; " \
 		"run mmcargs; " \
-		"run loadimage; " \
-		"run loadfdt;" \
+		"run loadimage && " \
+		"run unzipimage && " \
+		"run loadfdt && " \
 		"booti ${loadaddr} - ${fdt_addr}\0" \
 	"netboot=echo Booting from net ...; " \
 		"setenv bootargs; " \
 		"run netargs;  " \
 		"run set_getcmd; " \
-		"${get_cmd} ${loadaddr} ${image}; " \
-		"${get_cmd} ${fdt_addr} ${fdt_file}; " \
+		"${get_cmd} ${fdt_addr} ${image} && " \
+		"run unzipimage &&" \
+		"${get_cmd} ${fdt_addr} ${fdt_file} && " \
 		"booti ${loadaddr} - ${fdt_addr}\0" \
 	"update_kernel=run set_getcmd; "                                       \
 		"if ${get_cmd} ${image}; then "                                \
