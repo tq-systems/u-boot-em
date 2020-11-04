@@ -24,6 +24,7 @@ DECLARE_GLOBAL_DATA_PTR;
  */
 struct eth_device_priv {
 	enum eth_state_t state;
+	bool running;
 };
 
 /**
@@ -288,6 +289,7 @@ int eth_init(void)
 						current->uclass_priv;
 
 					priv->state = ETH_STATE_ACTIVE;
+					priv->running = true;
 					return 0;
 				}
 			} else {
@@ -317,13 +319,16 @@ void eth_halt(void)
 	struct eth_device_priv *priv;
 
 	current = eth_get_dev();
-	if (!current || !eth_is_active(current))
+	if (!current)
+		return;
+
+	priv = current->uclass_priv;
+	if (!priv || !priv->running)
 		return;
 
 	eth_get_ops(current)->stop(current);
-	priv = current->uclass_priv;
-	if (priv)
-		priv->state = ETH_STATE_PASSIVE;
+	priv->state = ETH_STATE_PASSIVE;
+	priv->running = false;
 }
 
 int eth_is_active(struct udevice *dev)
@@ -498,6 +503,7 @@ static int eth_post_probe(struct udevice *dev)
 #endif
 
 	priv->state = ETH_STATE_INIT;
+	priv->running = false;
 
 	/* Check if the device has a MAC address in ROM */
 	if (eth_get_ops(dev)->read_rom_hwaddr)
