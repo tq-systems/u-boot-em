@@ -64,6 +64,8 @@ static struct i2c_pads_info i2c_pad_info = {
 };
 
 extern struct dram_timing_info em4xx_512mb_lpddr4_timing;
+extern struct dram_timing_info em4xx_1gb_lpddr4_timing;
+extern struct dram_timing_info em4xx_2gb_lpddr4_timing;
 
 static void spl_dram_init(void)
 {
