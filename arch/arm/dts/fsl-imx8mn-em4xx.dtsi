@@ -9,12 +9,15 @@
 
 / {
 	model = "TQ Systems GmbH i.MX8MN on EM4XX-CB";
-	compatible = "tq,imx8mn-em4xx", "fsl,imx8mn";
+	compatible = "tq,em4xx", "fsl,imx8mn";
 
 	aliases {
 		mmc0 = &usdhc3;
 		/delete-property/ mmc1;
 		/delete-property/ mmc2;
+
+		serial1 = &uart3;
+		serial2 = &uart2;
 	};
 
 	chosen {
@@ -83,6 +86,10 @@
 	};
 };
 
+&cpu_crit0 {
+	temperature = <105000>;
+};
+
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec1>;
@@ -91,6 +98,18 @@
 	phy-reset-duration = <500>;
 	phy-reset-post-delay = <5>;
 	fsl,magic-packet;
+};
+
+&gpio1 {
+	gpio-line-names =
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"energymanager:vbus:enable", "energymanager:vbus:fault#", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "";
 };
 
 &iomuxc {
@@ -159,7 +178,7 @@
 			MX8MN_IOMUXC_ENET_TD0__ENET1_RGMII_TD0		0x0
 			MX8MN_IOMUXC_ENET_RD1__ENET1_RGMII_RD1		0x90
 			MX8MN_IOMUXC_ENET_RD0__ENET1_RGMII_RD0		0x90
- 			MX8MN_IOMUXC_ENET_RX_CTL__ENET1_RGMII_RX_CTL	0x90
+			MX8MN_IOMUXC_ENET_RX_CTL__ENET1_RGMII_RX_CTL	0x90
 			MX8MN_IOMUXC_ENET_TX_CTL__ENET1_RGMII_TX_CTL	0x0
 
 			MX8MN_IOMUXC_ENET_RD2__GPIO1_IO28		0x10
@@ -212,7 +231,7 @@
 		fsl,pins = <
 			MX8MN_IOMUXC_UART2_RXD__UART2_DCE_RX	0x0
 			MX8MN_IOMUXC_UART2_TXD__UART2_DCE_TX	0x0
-			MX8MN_IOMUXC_SAI3_RXD__GPIO4_IO30	0x0
+			MX8MN_IOMUXC_SAI3_RXC__UART2_DCE_CTS_B	0x0
 		>;
 	};
 
@@ -220,7 +239,7 @@
 		fsl,pins = <
 			MX8MN_IOMUXC_UART3_RXD__UART3_DCE_RX	0x0
 			MX8MN_IOMUXC_UART3_TXD__UART3_DCE_TX	0x0
-			MX8MN_IOMUXC_ECSPI1_SS0__GPIO5_IO9	0x0
+			MX8MN_IOMUXC_SD1_STROBE__UART3_DCE_CTS_B 0x0
 		>;
 	};
 
@@ -289,6 +308,8 @@
 };
 
 &i2c1 {
+	/* Keep this at 100kHz - our hardware can't use I2C fast mode
+	 * without violating timing constraints */
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
@@ -311,7 +332,7 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	rts-gpios = <&gpio4 30 GPIO_ACTIVE_HIGH>;
+	uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
 	status = "okay";
 };
@@ -319,7 +340,7 @@
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
-	rts-gpios = <&gpio5 9 GPIO_ACTIVE_HIGH>;
+	uart-has-rtscts;
 	linux,rs485-enabled-at-boot-time;
 	status = "okay";
 };
