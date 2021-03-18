@@ -31,12 +31,12 @@
 char *hw_rev_tbl[] = {
 	"REV0100",
 	"REV0101",
-	"REV0102",
-	"REV0103",
 	"REV0200",
 	"REV0201",
 	"REV0202",
-	"REV0203"
+	"REV0203",
+	"REV0204",
+	"REV0205",
 };
 
 char *hw_ver_tbl[] = {
