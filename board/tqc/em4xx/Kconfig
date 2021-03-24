@@ -24,9 +24,6 @@ config SYS_TEXT_BASE
 config SYS_MALLOC_F_LEN
 	default 0x2000
 
-config SAVED_DRAM_TIMING_BASE
-	default 0x40000000
-
 config FIT_EXTERNAL_OFFSET
 	default 0x3000
 
