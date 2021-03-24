@@ -63,13 +63,36 @@ static struct i2c_pads_info i2c_pad_info = {
 	},
 };
 
-extern struct dram_timing_info em4xx_512mb_lpddr4_timing;
-extern struct dram_timing_info em4xx_1gb_lpddr4_timing;
-extern struct dram_timing_info em4xx_2gb_lpddr4_timing;
-
 static void spl_dram_init(void)
 {
-	ddr_init(&em4xx_512mb_lpddr4_timing);
+	extern struct dram_timing_info em4xx_512mb_lpddr4_timing;
+	extern struct dram_timing_info em4xx_1gb_lpddr4_timing;
+	extern struct dram_timing_info em4xx_2gb_lpddr4_timing;
+
+	const struct {
+		long size;
+		struct dram_timing_info *timing;
+	} timings[] = {
+		{ SZ_2G, &em4xx_2gb_lpddr4_timing },
+		{ SZ_1G, &em4xx_1gb_lpddr4_timing },
+		{ SZ_512M, &em4xx_512mb_lpddr4_timing },
+	};
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(timings); i++) {
+		long ram_size = timings[i].size;
+		printf("Probing for %ld MiB RAM\n", (long)(ram_size / SZ_1M));
+		if (ddr_init(timings[i].timing))
+			continue;
+
+		if (get_ram_size((void *)PHYS_SDRAM, ram_size) == ram_size) {
+			printf("Detected %ld MiB RAM\n", (long)(ram_size / SZ_1M));
+			return;
+		}
+	}
+
+	puts("RAM detection failed\n");
+	hang();
 };
 
 static struct fsl_esdhc_cfg usdhc3_cfg = {
