@@ -22,6 +22,7 @@
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
+#include <asm/arch/ddr.h>
 #include <spl.h>
 
 #include "../common/tqc_bb.h"
@@ -153,13 +154,35 @@ int board_early_init_f(void)
 	return 0;
 }
 
+int board_phys_sdram_size(phys_size_t *size)
+{
+	if (!size)
+		return -EINVAL;
+
+	if ((reg32_read(DDRC_ADDRMAP0(0)) & 0x1f) == 0x17)
+		*size = SZ_2G;
+	else if ((reg32_read(DDRC_ADDRMAP6(0)) & 0x0f000000) == 0x07000000)
+		*size = SZ_1G;
+	else
+		*size = SZ_512M;
+
+	return 0;
+}
+
 int dram_init(void)
 {
+	phys_size_t sdram_size;
+	int ret;
+
+	ret = board_phys_sdram_size(&sdram_size);
+	if (ret)
+		return ret;
+
 	/* rom_pointer[1] contains the size of TEE occupies */
 	if (rom_pointer[1])
-		gd->ram_size = PHYS_SDRAM_SIZE - rom_pointer[1];
+		gd->ram_size = sdram_size - rom_pointer[1];
 	else
-		gd->ram_size = PHYS_SDRAM_SIZE;
+		gd->ram_size = sdram_size;
 
 	return 0;
 }
