@@ -67,13 +67,11 @@ static void spl_dram_init(void)
 {
 	extern struct dram_timing_info em4xx_512mb_lpddr4_timing;
 	extern struct dram_timing_info em4xx_1gb_lpddr4_timing;
-	extern struct dram_timing_info em4xx_2gb_lpddr4_timing;
 
 	const struct {
 		long size;
 		struct dram_timing_info *timing;
 	} timings[] = {
-		{ SZ_2G, &em4xx_2gb_lpddr4_timing },
 		{ SZ_1G, &em4xx_1gb_lpddr4_timing },
 		{ SZ_512M, &em4xx_512mb_lpddr4_timing },
 	};
