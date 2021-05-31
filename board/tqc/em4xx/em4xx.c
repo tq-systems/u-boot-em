@@ -15,6 +15,7 @@
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
 #include <fsl_esdhc.h>
+#include <led.h>
 #include <mmc.h>
 #include <netdev.h>
 #include <asm/arch/sys_proto.h>
@@ -197,6 +198,11 @@ int ft_board_setup(void *blob, bd_t *bd)
 int board_init(void)
 {
 #if !defined(CONFIG_SPL_BUILD)
+	struct udevice *status_led;
+
+	if (led_get_by_label("energymanager:red:status", &status_led) == 0)
+		led_set_state(status_led, LEDST_ON);
+
 	tqc_board_gpio_init(em4xx_gid, ARRAY_SIZE(em4xx_gid));
 	print_hw_info();
 #endif
