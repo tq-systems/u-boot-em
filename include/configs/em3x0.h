@@ -65,7 +65,6 @@
 
 /* Extra Environment */
 #define CONFIG_EXTRA_ENV_SETTINGS_COMMON \
-	"bootdelay=1\0" \
 	"BOOT_1_LEFT=3\0" \
 	"BOOT_2_LEFT=3\0" \
 	"BOOT_ORDER=1 2\0" \
