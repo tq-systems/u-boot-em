@@ -29,16 +29,15 @@
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
 
-
-char *hw_rev_tbl[] = {
-	"REV0100",
-	"REV0101",
-	"REV0200",
-	"REV0201",
-	"REV0202",
-	"REV0203",
-	"REV0204",
-	"REV0205",
+unsigned int hw_rev_tbl[] = {
+	0x0100,		/* "REV0100" */
+	0x0101,		/* "REV0101" */
+	0x0200,		/* "REV0200" */
+	0x0201,
+	0x0202,
+	0x0203,
+	0x0204,
+	0x0205,
 };
 
 char *hw_ver_tbl[] = {
@@ -104,21 +103,36 @@ static struct tqc_gpio_init_data em4xx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(USB_EN, "GPIO1_12", GPIOD_IS_OUT),
 };
 
-void print_hw_info(void)
+static unsigned int __hwrev_idx(void)
 {
 	int idx;
 	unsigned int hw_rev = 0x0;
-	unsigned int hw_ver = 0x0;
 
 	for (idx = HW_REV0; idx <= HW_REV2; ++idx)
 		hw_rev |= (dm_gpio_get_value(&em4xx_gid[idx].desc) ? 1 : 0) <<
 			(idx - HW_REV0);
 
+	return hw_rev;
+}
+
+static unsigned int __hwver_idx(void)
+{
+	int idx;
+	unsigned int hw_ver = 0x0;
+
 	for (idx = HW_VER0; idx <= HW_VER3; ++idx)
 		hw_ver |= (dm_gpio_get_value(&em4xx_gid[idx].desc) ? 1 : 0) <<
 			(idx - HW_VER0);
 
-	printf("HW:    %s | %s\n", hw_ver_tbl[hw_ver], hw_rev_tbl[hw_rev]);
+	return hw_ver;
+}
+
+void print_hw_info(void)
+{
+	unsigned int hw_rev = __hwrev_idx();
+	unsigned int hw_ver = __hwver_idx();
+
+	printf("HW:    %s | REV%04x\n", hw_ver_tbl[hw_ver], hw_rev_tbl[hw_rev]);
 };
 #endif
 
@@ -191,6 +205,10 @@ int dram_init(void)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	unsigned int hw_rev = __hwrev_idx();
+
+	do_fixup_by_path_u32(blob, "/", "tq,revision", hw_rev_tbl[hw_rev], 1);
+
 	return 0;
 }
 #endif
