@@ -283,7 +283,7 @@ int board_eth_init(bd_t *bis)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
-	do_fixup_by_path_u32(blob, "/", "tqs,revision", system_rev, 1);
+	do_fixup_by_path_u32(blob, "/", "tq,revision", system_rev, 1);
 
 	return 0;
 }
