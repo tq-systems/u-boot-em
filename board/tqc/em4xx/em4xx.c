@@ -56,7 +56,7 @@ char *hw_ver_tbl[] = {
 	"EM4XX-CB-U",
 	"EM4XX-CB-L",
 	"UNKNOWN",
-	"UNKNOWN"
+	"EEBUS-GW-L"
 };
 
 #if !defined(CONFIG_SPL_BUILD)
@@ -263,10 +263,10 @@ void adjust_env(void)
 {
 	enum boot_device bt_dev = get_boot_device();
 
-	if (!has_usb())
+	if (strcmp(CONFIG_DEFAULT_FDT_FILE, "imx8mn-em4xx-u.dtb") == 0 && !has_usb())
 		env_set("fdt_file", "imx8mn-em4xx-l.dtb");
 	else
-		env_set("fdt_file", "imx8mn-em4xx-u.dtb");
+		env_set("fdt_file", CONFIG_DEFAULT_FDT_FILE);
 
 	/* disable autoboot in serial download mode*/
 	if (bt_dev == USB_BOOT)

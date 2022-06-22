@@ -33,6 +33,12 @@ config SPL_FIT_GENERATOR
 config SYS_EXTRA_OPTIONS
 	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage-8mn-lpddr4.cfg,SPL_TEXT_BASE=0x912000"
 
+config IMX8MN_EM4XX_HWTYPE
+	string "Environment variable 'hwtype'"
+	default "em4xx"
+	help
+		Environment variable 'hwtype' used for tftp directory in boot_net
+
 config IMX8MN_EM4XX_DEFAULTS
 	bool
 	default y

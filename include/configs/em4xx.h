@@ -96,7 +96,7 @@
 
 /* Initial environment variables */
 #define EM4XX_ENV_SETTINGS \
-	"hwtype=em4xx\0" \
+	"hwtype=" CONFIG_IMX8MN_EM4XX_HWTYPE "\0" \
 	"image=Image.gz\0" \
 	"fdt_addr=0x43000000\0" \
 	"fdt_high=0xffffffffffffffff\0" \
