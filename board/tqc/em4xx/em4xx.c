@@ -17,7 +17,9 @@
 #include <fsl_esdhc.h>
 #include <led.h>
 #include <mmc.h>
+#include <linux/mdio.h>
 #include <netdev.h>
+#include <phy.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
@@ -28,6 +30,8 @@
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
+
+static bool em4xx_lan_detected;
 
 unsigned int hw_rev_tbl[] = {
 	0x0100,		/* "REV0100" */
@@ -263,23 +267,32 @@ void adjust_env(void)
 {
 	enum boot_device bt_dev = get_boot_device();
 
-	if (strcmp(CONFIG_DEFAULT_FDT_FILE, "imx8mn-em4xx-u.dtb") == 0 && !has_usb())
-		env_set("fdt_file", "imx8mn-em4xx-l.dtb");
-	else
+	/* MACHINE imx8mn-egw is a TARGET_IMX8MN_EM4XX but with a different DEFAULT_FDT_FILE config.
+	 * So, in case of a different config, use it for fdt_file.
+	 *
+	 * When DEFAULT_FDT_FILE is the default for EM4XX (USB),we are probably on a MACHINE
+	 * imx8mn-em4xx. So, for fdt_file, evaluate the hardware variant (USB or LAN)
+	 * via a designated GPIO.
+	 *
+	 * When USB variant is identified, fdt_file must also be set to EM4xx's DEFAULT_FDT_FILE
+	 * (USB). When USB variant is *not* identified, we must be on one of two LAN variants.
+	 * In that case fdt_file will be set to one of two LAN alternatives in board_phy_config()
+	 * later.
+	 */
+	if ((strcmp(CONFIG_DEFAULT_FDT_FILE, "imx8mn-em4xx-u.dtb") != 0) || (has_usb()))
 		env_set("fdt_file", CONFIG_DEFAULT_FDT_FILE);
+	else
+		em4xx_lan_detected = true;
 
 	/* disable autoboot in serial download mode*/
 	if (bt_dev == USB_BOOT)
 		env_set("bootdelay", "-1");
+
 }
 
-int board_phy_config(struct phy_device *phydev)
+int configure_micrel_switch(struct phy_device *phydev)
 {
 	int ret;
-
-	/* No switch in USB variant */
-	if (has_usb())
-		return 0;
 
 	/* Set KSZ8863 driver strength to 8mA */
 	ret = fec_smi_write(phydev, 0x0E, 0x07);
@@ -298,9 +311,48 @@ int board_phy_config(struct phy_device *phydev)
 	return 0;
 }
 
+#define MARVELL_SWITCH_ID 0x0205
+#define MICREL_PHY_ID 0x00221430
+int board_phy_config(struct phy_device *phydev)
+{
+	int ret;
+	u32 id;
+	const char *fdt_file = NULL;
+
+	/* No switch in USB variant */
+	if (has_usb())
+		return 0;
+
+	/* Identify switch chip */
+	/* Micrel KSZ8863 by reading PHY ID register, addr 0x3 reg 0x2..0x3 */
+	ret = get_phy_id(phydev->bus, 0x3, MDIO_DEVAD_NONE, &id);
+	if (!ret && id == MICREL_PHY_ID) {
+		printf("Found Micrel PHY ID: %08x\n", id);
+		fdt_file = "imx8mn-em4xx-l-ksz8863.dtb";
+
+		ret = configure_micrel_switch(phydev);
+		if (ret)
+			return ret;
+	} else {
+		/* Marvell MV88E6020 by reading Switch ID register, addr 0x18 reg 0x3 */
+		ret = phydev->bus->read(phydev->bus, 0x18, MDIO_DEVAD_NONE, 0x3);
+		if (ret < 0)
+			return -EIO;
+
+		if (ret == MARVELL_SWITCH_ID) {
+			printf("Found Marvell Switch ID: %04x\n", ret);
+			fdt_file = "imx8mn-em4xx-l-mv88e6020.dtb";
+		}
+	}
+
+	if (em4xx_lan_detected && fdt_file)
+		env_set("fdt_file", fdt_file);
+
+	return 0;
+}
+
 int board_late_init(void)
 {
-
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
