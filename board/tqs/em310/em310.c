@@ -236,26 +236,32 @@ int board_eth_init(bd_t *bis)
 		CLKCTRL_ENET_TIME_SEL_MASK | CLKCTRL_ENET_CLK_OUT_EN,
 		CLKCTRL_ENET_TIME_SEL_RMII_CLK);
 
-	gpio_set_value(GPIO_PHY_ENABLE, 0);
-	gpio_direction_output(GPIO_PHY_ENABLE, 1);
-	udelay(200);
-	gpio_set_value(GPIO_PHY_ENABLE, 1);
-	udelay(200);
 	/*
 	 * Reset PHY
-	 * We first drive the pin HIGH before we switch to output. This should
-	 * prevent a tiny glitch which could cause a short drop of the clock output
+	 * gpio_direction_output() in mxs_gpio.c first sets value before
+	 * switching to output.
+	 * This should prevent a tiny glitch which could cause a short drop of the clock output
 	 * of the PHY (PHY is running in REFCLKO mode).
 	 */
+	gpio_direction_output(GPIO_PHY_RESET, 0);
+	gpio_direction_output(GPIO_PHY_ENABLE, 0);
+
+	udelay(200);
+
+	/* enable VCC3V3_ETH_EN */
+	gpio_set_value(GPIO_PHY_ENABLE, 1);
+
+	udelay(100000);
+
+	/* generate high-low edge */
 	gpio_set_value(GPIO_PHY_RESET, 1);
-	gpio_direction_output(GPIO_PHY_RESET, 1);
 	udelay(50);
 	gpio_set_value(GPIO_PHY_RESET, 0);
 	udelay(200);
 	gpio_set_value(GPIO_PHY_RESET, 1);
 
 	/* give PHY some time to get out of the reset */
-	udelay(10000);
+	udelay(50000);
 
 	ret = fecmxc_initialize_multi(bis, 0, 0, MXS_ENET0_BASE);
 	if (ret) {
