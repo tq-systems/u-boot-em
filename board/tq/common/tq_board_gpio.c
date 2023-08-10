@@ -30,3 +30,14 @@ int tq_board_gpio_init(struct tq_gpio_init_data *data, size_t count)
 
 	return 0;
 }
+
+unsigned int tq_board_gpio_data(const struct tq_gpio_init_data *data, size_t first, size_t last)
+{
+	size_t i;
+	unsigned int ret = 0x0;
+
+	for (i = first; i <= last; ++i)
+		ret |= (dm_gpio_get_value(&data[i].desc) ? 1 : 0) << (i - first);
+
+	return ret;
+}

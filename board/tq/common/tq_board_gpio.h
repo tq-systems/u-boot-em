@@ -27,10 +27,15 @@ struct tq_gpio_init_data {
 	}
 
 int tq_board_gpio_init(struct tq_gpio_init_data *data, size_t count);
-
+unsigned int tq_board_gpio_data(const struct tq_gpio_init_data *data, size_t first, size_t last);
 #else
 static inline int tq_board_gpio_init(struct tq_gpio_init_data *data,
 				     size_t count)
+{
+	return 0;
+}
+
+static inline unsigned int tq_board_gpio_data(const struct tq_gpio_init_data *data, size_t first, size_t last)
 {
 	return 0;
 }
