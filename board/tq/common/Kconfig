@@ -1,2 +1,6 @@
+config TQ_BOARDGPIO
+	bool
+	default y if DM_GPIO
+
 config TQ_RTC
 	bool
