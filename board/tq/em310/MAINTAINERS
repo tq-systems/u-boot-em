@@ -1,0 +1,7 @@
+TQ SYSTEMS EM310
+M:	Christoph Krutz <christoph.krutz@tq-group.com>
+S:	Maintained
+F:	board/tq/em310/
+F:	include/configs/em310.h
+F:	configs/em310_defconfig
+F:	arch/arm/dts/imx28-em310.dts

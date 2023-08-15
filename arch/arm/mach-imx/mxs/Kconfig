@@ -47,6 +47,10 @@ config TARGET_XEA
 	bool "Support XEA"
 	select PL01X_SERIAL
 
+config TARGET_EM310
+	bool "Support em310"
+	select BOARD_EARLY_INIT_F
+
 endchoice
 
 config SYS_SOC
@@ -71,5 +75,6 @@ config SPL_MXS_PMU_ENABLE_4P2_LINEAR_REGULATOR
 
 source "board/freescale/mx28evk/Kconfig"
 source "board/liebherr/xea/Kconfig"
+source "board/tq/em310/Kconfig"
 
 endif

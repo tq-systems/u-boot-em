@@ -872,6 +872,7 @@ dtb-$(CONFIG_TARGET_MX23_OLINUXINO) += \
 	imx23-olinuxino.dtb
 
 dtb-$(CONFIG_MX28) += \
+	imx28-em310.dtb \
 	imx28-evk.dtb \
 	imx28-xea.dtb
 
