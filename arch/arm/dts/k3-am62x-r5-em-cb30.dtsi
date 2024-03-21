@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: GPL-2.0-only OR MIT
+/*
+ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2023-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ *
+ * TQ-Systems EM-CB30 - Common R5 SPL settings
+ */
+
+/* WKUP UART0 is used for DM firmware logs */
+&wkup_uart0 {
+	/*
+	 * DM firmware expects the UART to be set up. The pins are not actually
+	 * connected on the EM-CB30, so no pinctrl is configured.
+	 */
+	status = "okay";
+	bootph-pre-ram;
+};

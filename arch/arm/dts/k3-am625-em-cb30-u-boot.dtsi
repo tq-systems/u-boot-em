@@ -1,0 +1,215 @@
+// SPDX-License-Identifier: GPL-2.0-only OR MIT
+/*
+ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2023-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+#include "k3-am625-em-cb30-binman.dtsi"
+
+/ {
+	chosen {
+		tick-timer = &main_timer0;
+	};
+
+	memory@80000000 {
+		bootph-all;
+	};
+
+	leds {
+		bootph-all;
+
+		status_green {
+			/delete-property/ linux,default-trigger;
+		};
+
+		status_red {
+			default-state = "on";
+			bootph-all;
+		};
+	};
+
+	/*
+	 * sysinfo is not marked as bootph-all - we don't want want
+	 * early show_board_info() to use this info
+	 */
+	sysinfo-ver {
+		compatible = "gpio-sysinfo";
+		gpios =
+			<&main_gpio0 69 GPIO_ACTIVE_HIGH>, /* HW.VER0 */
+			<&main_gpio0 70 GPIO_ACTIVE_HIGH>, /* HW.VER1 */
+			<&main_gpio0 68 GPIO_ACTIVE_HIGH>, /* HW.VER2 */
+			<&main_gpio0 67 GPIO_ACTIVE_HIGH>; /* HW.VER3 */
+
+		revisions = <0x0>, <0x3>;
+		names = "EM-CB30-LLRR", "EM-CB30-L";
+	};
+
+	sysinfo-rev {
+		compatible = "gpio-sysinfo";
+		gpios =
+			<&main_gpio0 65 GPIO_ACTIVE_HIGH>, /* HW.REV0 */
+			<&main_gpio0 71 GPIO_ACTIVE_HIGH>, /* HW.REV1 */
+			<&main_gpio0 72 GPIO_ACTIVE_HIGH>; /* HW.REV2 */
+
+		revisions = <0x0>;
+		names = "0100";
+	};
+};
+
+&cbass_main {
+	bootph-all;
+};
+
+&main_timer0 {
+	clock-frequency = <25000000>;
+	bootph-all;
+};
+
+&cbass_mcu {
+	bootph-all;
+};
+
+&cbass_wakeup {
+	bootph-all;
+};
+
+&chipid {
+	bootph-all;
+};
+
+/* The U-Boot CPSW driver supports only one port */
+&cpsw_port2 {
+	status = "disabled";
+};
+
+&dmss {
+	bootph-all;
+};
+
+&dmsc {
+	bootph-all;
+
+	k3_sysreset: sysreset-controller {
+		compatible = "ti,sci-sysreset";
+		bootph-all;
+	};
+};
+
+&hwid_pins {
+	bootph-all;
+};
+
+&k3_clks {
+	bootph-all;
+};
+
+&k3_pds {
+	bootph-all;
+};
+
+&k3_reset {
+	bootph-all;
+};
+
+&led_pins {
+	bootph-all;
+};
+
+&main_bcdma {
+	reg = <0x00 0x485c0100 0x00 0x100>,
+	      <0x00 0x4c000000 0x00 0x20000>,
+	      <0x00 0x4a820000 0x00 0x20000>,
+	      <0x00 0x4aa40000 0x00 0x20000>,
+	      <0x00 0x4bc00000 0x00 0x100000>,
+	      <0x00 0x48600000 0x00 0x8000>,
+	      <0x00 0x484a4000 0x00 0x2000>,
+	      <0x00 0x484c2000 0x00 0x2000>;
+	reg-names = "gcfg", "bchanrt", "rchanrt", "tchanrt",
+		    "ringrt" , "cfg", "tchan", "rchan";
+};
+
+&main_pktdma {
+	reg = <0x00 0x485c0000 0x00 0x100>,
+	      <0x00 0x4a800000 0x00 0x20000>,
+	      <0x00 0x4aa00000 0x00 0x20000>,
+	      <0x00 0x4b800000 0x00 0x200000>,
+	      <0x00 0x485e0000 0x00 0x10000>,
+	      <0x00 0x484a0000 0x00 0x2000>,
+	      <0x00 0x484c0000 0x00 0x2000>,
+	      <0x00 0x48430000 0x00 0x1000>;
+	reg-names = "gcfg", "rchanrt", "tchanrt", "ringrt",
+		    "cfg", "tchan", "rchan", "rflow";
+};
+
+&main_gpio0 {
+	bootph-all;
+
+	/delete-node/ hw-rev0-hog;
+	/delete-node/ hw-rev1-hog;
+	/delete-node/ hw-rev2-hog;
+	/delete-node/ hw-ver0-hog;
+	/delete-node/ hw-ver1-hog;
+	/delete-node/ hw-ver2-hog;
+	/delete-node/ hw-ver3-hog;
+};
+
+&main_gpio1 {
+	bootph-all;
+};
+
+&main_i2c0 {
+	bootph-all;
+};
+
+&main_i2c0_pins {
+	bootph-all;
+};
+
+&main_mmc0_pins {
+	bootph-all;
+};
+
+&main_uart0 {
+	bootph-all;
+};
+
+&main_uart0_pins {
+	bootph-all;
+};
+
+&main_pmx0 {
+	bootph-all;
+};
+
+&reg_5v {
+	bootph-all;
+};
+
+&sdhci0 {
+	bootph-all;
+};
+
+&secure_proxy_main {
+	bootph-all;
+};
+
+&tps65219 {
+	bootph-all;
+};
+
+&usbss0 {
+	ti,vbus-divider;
+	bootph-all;
+	status = "okay";
+};
+
+&usb0 {
+	dr_mode = "peripheral";
+	bootph-all;
+};
+
+&wkup_conf {
+	bootph-all;
+};
