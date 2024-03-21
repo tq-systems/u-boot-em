@@ -1,0 +1,167 @@
+# TQ-Systems EM-CB30
+
+The TQ-Systems Energy Manager Compute Board 30 is based on the TI AM62 SoC
+family.
+
+## Hardware variants
+
+Currently, EM-CB30-LLRR REV.0100 prototypes with 512MiB, 1GiB and 2GiB of RAM
+are supported. No variant detection for RAM configurations exists yet, so
+separate tiboot3.bin builds are needed.
+
+The following configurations are used:
+
+- EM-CB30-512M_r5_defconfig
+- EM-CB30-1G_r5_defconfig
+- EM-CB30-2G_r5_defconfig
+- EM-CB30_a53_defconfig
+
+As described in the following section, bootloaders for both the R5 and A53
+cores of the AM62x must be built.
+
+## Boot sequence
+
+The bootloader on the AM62 is loaded in multiple stages. 3 of these stages
+are provided by this U-Boot repository:
+
+* R5 U-Boot SPL (combined with firmwares to `tiboot3.bin`)
+* A53 U-Boot SPL (combined with firmwares to `tispl.bin`)
+* A53 U-Boot (`u-boot.img`)
+
+The R5 bootloader performs the following actions:
+
+* Initialize DDR controller
+* Load `tispl.bin` into DDR RAM
+* Boot ATF
+
+The next stage is handled by the ATF. It will start the OP-TEE and the A53 SPL,
+which have already been loaded by the R5 bootloader. The A53 SPL then loads and
+starts the full A53 U-Boot from `u-boot.img`.
+
+Finally, the full A53 U-Boot runs, which can provide a command line interface
+and boot into the actual OS depending on its configuration.
+
+## A53 build
+
+The A53 SPL and full U-Boot are both built from the `a53` defconfigs. The build
+requires an ARM-v8/AArch64 cross compiler.
+
+BL31 (ATF) and BL32 (OP-TEE) must be built separately and provided to `make`
+by passing the paths to the binaries in the `BL31` and `TEE` variables.
+
+In addition, a number of TI firmware files must be available during build.
+
+The firmware can be found in the `ti-linux-firmware` branch of:
+
+  https://git.ti.com/git/processor-firmware/ti-linux-firmware.git
+
+A symlink to the `ti-sysfw` directory must then be created in the R5 U-Boot
+build directory:
+
+```
+ln -s /path/to/ti-linux-firmware/ti-sysfw .
+```
+
+## R5 build
+
+The R5 bootloader is built from the `r5` defconfigs and it requires an ARM-v7
+cross compiler (32bit). Only the SPL component of this build is used.
+
+In addition, a number of TI firmware files must be available during build,
+from the same repository used for the A53 build.
+
+Symlinks to the `ti-dm` and `ti-sysfw` directories must then be created in the R5
+U-Boot build directory:
+
+```
+ln -s /path/to/ti-linux-firmware/ti-dm .
+ln -s /path/to/ti-linux-firmware/ti-sysfw .
+```
+
+The build will generate R5 SPL binaries for 3 variants of the AM62 SoC:
+
+- tiboot3-am62x-gp-evm.bin: AM62 General Purpose
+- tiboot3-am62x-hs-fs-evm.bin: AM62 High Security - Field Securable
+- tiboot3-am62x-hs-evm.bin: AM62 High Security - Security Enforced
+
+Only the `hs-fs` variant is currently used on the EM-CB30.
+
+## Memory layout for R5 SPL
+
+Refer to:
+
+https://downloads.ti.com/processor-sdk-linux/esd/AM62X/09_00_00_03/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#sram-memory-layout-during-r5-spl-bootloader-stage
+
+## Boot from eMMC boot partitions
+
+The following layout is used by default to store U-Boot and its environment
+in the eMMC boot partition. The layout can be modified by changing
+CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR to a different offset for the next stage
+in the R5 and A53 SPLs.
+
+Offsets are given in sectors (512B).
+
+    0x0000+------------------------------+
+          | tiboot3.bin (512 KiB)        |
+    0x0400+------------------------------+
+          | tispl.bin (1536 KiB)         |
+    0x1000+------------------------------+
+          | u-boot.img (2 MiB)           |
+    0x2000+------------------------------+
+
+The boot partitions can be enabled or disabled using the following commands:
+```
+mmc bootbus 0 2 0 0 # Configure for 8bit bus width
+mmc partconf 0 1 1 1 # Boot from bootpart 1
+mmc partconf 0 1 2 1 # Boot from bootpart 2 (alternative)
+```
+
+For boot from a boot partition to work after a reset/reboot without power cycle,
+the reset signal of the eMMC must be enabled using the following command:
+```
+mmc rst-function 0 1
+```
+WARNING: `mmc rst-function` is a write-once configuration that cannot be
+reverted.
+
+U-Boot's environment is stored in the in the User Data Area (at byte offsets
+0x400000 and 0x420000), so it is shared regardless of the active boot partition.
+
+## USB boot
+
+The boot mode pins must be set up for USB Device boot. `dfu-util` can then
+be used to send the different bootloader stages to the device from a connected
+PC:
+
+```
+dfu-util -R -a bootloader -D tiboot3-am62x-hs-fs-evm.bin
+dfu-util -R -a tispl.bin -D tispl.bin
+dfu-util -R -a u-boot.img -D u-boot.img
+```
+
+## Flashing using DFU
+
+`dfu-util` can also be used to program the eMMC via USB.
+
+Run `env default dfu_alt_info` if your saved environment contains an obsolete
+flash layout. `dfu 0 mmc 0` is used to start the DFU server. The following
+commands can then be used on a connected PC to program the eMMC using the
+layout described above:
+```
+dfu-util -a tiboot3.bin.raw -D tiboot3-am62x-hs-fs-evm.bin
+dfu-util -a tispl.bin.raw -D tispl.bin
+dfu-util -a u-boot.img.raw -D u-boot.img
+```
+
+Alternatively, the 3 bootloader stages can be combined to a single binary
+`combined-bootloader.img` (with proper padding, so each file starts at the
+correct offset), which can then be flashed with a single command:
+```
+dfu-util -a boot.raw -D combined-bootloader.img
+```
+
+It is also possible to flash an image (complete with partition table) to the
+eMMC User Data Area:
+```
+dfu-util -a emmc -D full-mmc.img
+```
