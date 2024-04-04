@@ -15,7 +15,7 @@
 		filename = "tiboot3-am62x-hs-evm.bin";
 		ti-secure-rom {
 			content = <&u_boot_spl>, <&ti_fs_enc>, <&combined_tifs_cfg>,
-				  <&combined_dm_cfg>, <&sysfw_inner_cert>;
+				  <&sysfw_inner_cert>, <&combined_dm_cfg>;
 			combined;
 			dm-data;
 			sysfw-inner-cert;
@@ -43,14 +43,14 @@
 			filename = "combined-tifs-cfg.bin";
 			type = "blob-ext";
 		};
-		combined_dm_cfg: combined-dm-cfg.bin {
-			filename = "combined-dm-cfg.bin";
-			type = "blob-ext";
-		};
 		sysfw_inner_cert: sysfw-inner-cert {
 			filename = "ti-sysfw/ti-fs-firmware-am62x-hs-cert.bin";
 			type = "blob-ext";
 			optional;
+		};
+		combined_dm_cfg: combined-dm-cfg.bin {
+			filename = "combined-dm-cfg.bin";
+			type = "blob-ext";
 		};
 	};
 };
@@ -61,7 +61,7 @@
 		symlink = "tiboot3.bin";
 		ti-secure-rom {
 			content = <&u_boot_spl_fs>, <&ti_fs_enc_fs>, <&combined_tifs_cfg_fs>,
-				  <&combined_dm_cfg_fs>, <&sysfw_inner_cert_fs>;
+				  <&sysfw_inner_cert_fs>, <&combined_dm_cfg_fs>;
 			combined;
 			dm-data;
 			sysfw-inner-cert;
@@ -89,14 +89,14 @@
 			filename = "combined-tifs-cfg.bin";
 			type = "blob-ext";
 		};
-		combined_dm_cfg_fs: combined-dm-cfg.bin {
-			filename = "combined-dm-cfg.bin";
-			type = "blob-ext";
-		};
 		sysfw_inner_cert_fs: sysfw-inner-cert {
 			filename = "ti-sysfw/ti-fs-firmware-am62x-hs-fs-cert.bin";
 			type = "blob-ext";
 			optional;
+		};
+		combined_dm_cfg_fs: combined-dm-cfg.bin {
+			filename = "combined-dm-cfg.bin";
+			type = "blob-ext";
 		};
 	};
 };
