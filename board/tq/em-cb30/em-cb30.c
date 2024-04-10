@@ -8,6 +8,7 @@
  */
 
 #include <cpu_func.h>
+#include <env.h>
 #include <spl.h>
 #include <init.h>
 #include <k3-ddrss.h>
@@ -149,5 +150,53 @@ void spl_perform_fixups(struct spl_image_info *spl_image)
 #else
 	fixup_memory_node(spl_image);
 #endif
+}
+#endif
+
+#ifdef CONFIG_OF_BOARD_SETUP
+static int em_cb30_set_revision(void *blob)
+{
+	char revbuf[8] = {};
+	char *endp;
+	ulong rev;
+	int ret;
+
+	ret = em_cb30_board_model("/sysinfo-rev", sizeof(revbuf), revbuf);
+	if (ret)
+		return ret;
+
+	rev = hextoul(revbuf, &endp);
+	if (*endp) /* Revision string in Device Tree is not a valid hex number */
+		return -EINVAL;
+
+	do_fixup_by_path_u32(blob, "/", "tq,revision", rev, 1);
+
+	return 0;
+}
+
+static int em_cb30_set_serial(void *blob)
+{
+	const char *serial = env_get("serial");
+
+	if (!serial)
+		return -ENOENT;
+
+	do_fixup_by_path_string(blob, "/", "tq,serial-number", serial);
+
+	return 0;
+}
+
+int ft_board_setup(void *blob, struct bd_info *bd)
+{
+	int ret;
+
+	ret = em_cb30_set_revision(blob);
+	if (ret)
+		printf("Failed to set board revision in FDT: %d\n", ret);
+	ret = em_cb30_set_serial(blob);
+	if (ret)
+		printf("Failed to set serial number in FDT: %d\n", ret);
+
+	return 0;
 }
 #endif
