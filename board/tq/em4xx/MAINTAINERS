@@ -1,0 +1,8 @@
+TQ Systems GmbH em4xx Board
+M:	Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+S:	Maintained
+F:	board/tq/em4xx/
+F:	include/configs/em4xx.h
+F:	configs/imx8mn_em4xx_cb_defconfig
+F:	arch/arm/dts/imx8mn-em4xx*.dtsi
+F:	arch/arm/dts/imx8mn-em4xx*.dts

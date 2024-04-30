@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (c) 2023 - 2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Michael Krummsdorf
+ */
+
+#include "imx8mn-u-boot.dtsi"
+
+/ {
+	aliases {
+		/delete-property/ mdio-gpio0;
+	};
+
+	leds {
+		led1-gn {
+			default-state = "on";
+		};
+
+		led1-rd {
+			default-state = "on";
+		};
+	};
+
+	/delete-node/ mdio;
+};
+
+&binman {
+	itb {
+		fit {
+			images {
+				fdt-u {
+					description = "fdt-u";
+					type = "flat_dt";
+					compression = "none";
+					blob {
+						filename = "arch/arm/dts/imx8mn-em4xx-u.dtb";
+					};
+				};
+
+				fdt-l {
+					description = "fdt-l";
+					type = "flat_dt";
+					compression = "none";
+					blob {
+						filename = "arch/arm/dts/imx8mn-em4xx-l.dtb";
+					};
+				};
+			};
+
+			configurations {
+				default = "conf-u";
+
+				conf-u {
+					description = "imx8mn-em4xx-u";
+					firmware = "uboot";
+					loadables = "atf";
+					fdt = "fdt-u";
+				};
+
+				conf-l {
+					description = "imx8mn-em4xx-l";
+					firmware = "uboot";
+					loadables = "atf";
+					fdt = "fdt-l";
+				};
+			};
+		};
+	};
+};
+
+&fec1 {
+	pinctrl-0 = <&pinctrl_fec1>,
+		    <&pinctrl_fec1mdio>,
+		    <&pinctrl_enet_reset>;
+	/* U-Boot network as fixed-link, use generic reset */
+	phy-reset-gpios = <&gpio1 28 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <10>;
+	phy-reset-post-delay = <100>;
+
+	/delete-property/ phy-handle;
+	/delete-node/ mdio;
+};
+
+&gpio1 {
+	bootph-pre-ram;
+};
+
+&gpio2 {
+	bootph-pre-ram;
+};
+
+&gpio3 {
+	bootph-pre-ram;
+};
+
+&gpio4 {
+	bootph-pre-ram;
+};
+
+&i2c1 {
+	bootph-pre-ram;
+};
+
+&pca9450 {
+	bootph-pre-ram;
+
+	regulators {
+		bootph-pre-ram;
+	};
+};
+
+&pinctrl_i2c1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_pmic {
+	bootph-pre-ram;
+};
+
+&pinctrl_uart1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc3 {
+	bootph-pre-ram;
+};
+
+&pinctrl_wdog {
+	bootph-pre-ram;
+};
+
+&uart1 {
+	bootph-pre-ram;
+};
+
+&usdhc3 {
+	bootph-pre-ram;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+};

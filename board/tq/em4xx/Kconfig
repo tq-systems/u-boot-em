@@ -1,0 +1,157 @@
+if TARGET_IMX8MN_EM4XX
+
+config SYS_BOARD
+	default "em4xx"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "em4xx"
+
+config DEFAULT_DEVICE_TREE
+	default "imx8mn-em4xx-u"
+
+config DEFAULT_FDT_FILE
+	default "imx8mn-em4xx-u.dtb"
+
+config NR_DRAM_BANKS
+	default 1
+
+config TEXT_BASE
+	default 0x40200000
+
+config SYS_MALLOC_F_LEN
+	default 0x2000
+
+config FIT_EXTERNAL_OFFSET
+	default 0x3000
+
+config IMX_CONFIG
+	default "board/tq/em4xx/imximage.cfg"
+
+config IMX8MN_EM4XX_HWTYPE
+	string "Environment variable 'hwtype'"
+	default "em4xx"
+	help
+		Environment variable 'hwtype' used for tftp directory in boot_net
+
+choice
+	prompt "EM4xx RAM size selection"
+	default IMX8MN_EM4XX_MEMORY_1G
+
+config IMX8MN_EM4XX_MEMORY_1G
+	bool "1 GiB"
+
+config IMX8MN_EM4XX_MEMORY_512M
+	bool "512 MiB"
+
+endchoice
+
+config IMX8MN_EM4XX_DEFAULTS
+	bool
+	default y
+	select ARCH_MISC_INIT
+	select TQ_RTC
+	select TQ_SDMMC
+	select CMD_FUSE
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM
+	select DM_RTC
+	select DM_MMC
+	select MMC_IO_VOLTAGE
+	select MMC_HS400_SUPPORT
+	select FSL_ESDHC_IMX
+	select DM_THERMAL
+	select DM_SERIAL
+	select DM_PMIC
+	select MXC_UART
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
+	select MISC
+	select SPL
+	select SPL_LOAD_FIT
+	select SPL_BOARD_INIT
+	select SPL_ENV_SUPPORT
+	select SPL_SERIAL_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+	select ENV_IS_IN_MMC
+	select MII
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	select DM_ETH
+	select FEC_MXC
+	select PHYLIB
+	select PHY_FIXED
+	select USB
+	select DM_USB
+	select USB_EHCI_HCD
+	select MXC_USB_OTG_HACTIVE
+
+config IMX8MN_EM4XX_UUU_SUPPORT
+	bool "EM4XX UUU SUPPORT"
+	select USB_GADGET
+	select CI_UDC
+	select USB_FUNCTION_SDP
+	select USB_FUNCTION_FASTBOOT
+	select FASTBOOT_UUU_SUPPORT
+	select FASTBOOT_FLASH
+	select CMD_FASTBOOT
+	select SPL_USB_HOST_SUPPORT
+	select SPL_USB_GADGET
+	select SPL_IMX_ROMAPI_SUPPORT
+
+if IMX8MN_EM4XX_UUU_SUPPORT
+
+config USB_GADGET_MANUFACTURER
+	default "FSL"
+
+config USB_GADGET_VENDOR_NUM
+	default 0x0525
+
+config USB_GADGET_PRODUCT_NUM
+	default 0xa4a5
+
+config USB_GADGET_VBUS_DRAW
+	default 2
+
+config SDP_LOADADDR
+	default 0x40400000
+
+config FASTBOOT_BUF_ADDR
+	default 0x42800000
+
+config SPL_IMX_ROMAPI_LOADADDR
+	default 0x48000000
+
+# restrict to 256M
+config FASTBOOT_BUF_SIZE
+	default 0x10000000
+
+config FASTBOOT_USB_DEV
+	default 0
+
+endif
+
+source "board/tq/common/Kconfig"
+
+endif
