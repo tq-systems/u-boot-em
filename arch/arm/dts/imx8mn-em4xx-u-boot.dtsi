@@ -9,6 +9,7 @@
 
 / {
 	aliases {
+		/delete-property/ ethernet1;
 		/delete-property/ mdio-gpio0;
 	};
 
