@@ -83,7 +83,7 @@
 		"${get_cmd} ${fdt_addr} ${hwtype}/${fdtfile} && " \
 		"echo 'Loaded kernel and device tree via tftp' && " \
 		"booti ${loadaddr} - ${fdt_addr}\0" \
-	"set_getcmd=if test \"${ipmode}\" = static; then "                     \
+	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
 			"setenv get_cmd tftp; "                                \
