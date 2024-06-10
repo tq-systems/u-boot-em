@@ -20,6 +20,8 @@
 #include <power/pmic.h>
 #include <power/tps65219.h>
 
+#include "../common/tq_rtc.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 void spl_board_init(void)
@@ -77,6 +79,11 @@ int board_late_init(void)
 	em_cb30_board_model("/sysinfo-rev", sizeof(revbuf), revbuf);
 
 	printf("Board version: %s REV.%s\n", verbuf, revbuf);
+
+	/* set quartz load to 12500 femtofarads */
+	tq_pcf85063_init_capacity(0, 0x51, 12500);
+	tq_pcf85063_init_clkout(0, 0x51, TQ_PCF85063_CLKOUT_OFF);
+	tq_pcf85063_init_offset(0, 0x51, true, 5);
 
 	return 0;
 }

@@ -16,6 +16,7 @@ config TARGET_AM625_A53_EM_CB30
 	bool "EM-CB30 running on A53"
 	select ARM64
 	select BINMAN
+	select TQ_RTC
 
 config TARGET_AM625_R5_EM_CB30
 	bool "EM-CB30 running on R5"
@@ -40,6 +41,8 @@ config SYS_VENDOR
 
 config SYS_CONFIG_NAME
        default "em-cb30"
+
+source "board/tq/common/Kconfig"
 
 endif
 
