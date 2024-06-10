@@ -218,15 +218,10 @@ int misc_init_r(void)
 
 int board_late_init(void)
 {
-	/* power-on reset on rtc is sometimes incomplete and leave corrupted registers */
-	tq_pcf85063_clear_reg(0, 0x51, 0x00);
-	tq_pcf85063_clear_reg(0, 0x51, 0x01);
-	tq_pcf85063_clear_reg(0, 0x51, 0x02);
-
 	/* set quartz load to 12500 femtofarads */
-	tq_pcf85063_adjust_capacity(0, 0x51, 12500);
-	tq_pcf85063_set_clkout(0, 0x51, TQ_PCF85063_CLKOUT_OFF);
-	tq_pcf85063_set_offset(0, 0x51, true, 5);
+	tq_pcf85063_init_capacity(0, 0x51, 12500);
+	tq_pcf85063_init_clkout(0, 0x51, TQ_PCF85063_CLKOUT_OFF);
+	tq_pcf85063_init_offset(0, 0x51, true, 5);
 
 	return 0;
 }
