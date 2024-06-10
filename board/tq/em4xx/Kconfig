@@ -52,8 +52,8 @@ config IMX8MN_EM4XX_DEFAULTS
 	bool
 	default y
 	select ARCH_MISC_INIT
+	select TQ_BOARDGPIO
 	select TQ_RTC
-	select TQ_SDMMC
 	select CMD_FUSE
 	select BOARD_LATE_INIT
 	select FIT

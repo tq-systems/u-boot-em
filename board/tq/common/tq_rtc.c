@@ -8,7 +8,7 @@
 #include <common.h>
 #include <i2c.h>
 
-#include "tq_bb.h"
+#include "tq_rtc.h"
 
 #define PCF85063_REG_CTRL1		0x00 /* status */
 #define PCF85063_REG_CTRL1_CAP_SEL	BIT(0)

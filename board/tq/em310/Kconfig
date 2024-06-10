@@ -18,8 +18,8 @@ config SYS_MXS_VDD5V_ONLY
 config EM310_DEFAULTS
 	bool
 	default y
+	select TQ_BOARDGPIO
 	select TQ_RTC
-	select TQ_EMMC
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
 

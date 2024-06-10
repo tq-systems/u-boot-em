@@ -33,8 +33,8 @@
 #include <asm/arch/ddr.h>
 #include <linux/stringify.h>
 
-#include "../common/tq_bb.h"
 #include "../common/tq_board_gpio.h"
+#include "../common/tq_rtc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
