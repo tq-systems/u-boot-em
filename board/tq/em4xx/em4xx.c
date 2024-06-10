@@ -111,11 +111,6 @@ static void print_hw_info(void)
 };
 #endif
 
-int board_early_init_f(void)
-{
-	return 0;
-}
-
 #if defined(CONFIG_OF_BOARD_SETUP) && !defined(CONFIG_SPL_BUILD)
 static int em4xx_set_revision(void *blob)
 {

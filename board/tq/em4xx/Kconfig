@@ -56,7 +56,6 @@ config IMX8MN_EM4XX_DEFAULTS
 	select TQ_SDMMC
 	select CMD_FUSE
 	select BOARD_LATE_INIT
-	select BOARD_EARLY_INIT_F
 	select FIT
 	select OF_CONTROL
 	select OF_BOARD_SETUP
