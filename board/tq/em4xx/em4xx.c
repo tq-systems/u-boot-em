@@ -31,7 +31,6 @@
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/ddr.h>
-#include <spl.h>
 #include <linux/stringify.h>
 
 #include "../common/tq_bb.h"
@@ -71,7 +70,6 @@ static const char *const hw_ver_tbl[] = {
 	"EEBUS-GW-L"
 };
 
-#if !defined(CONFIG_SPL_BUILD)
 enum {
 	HW_REV0,
 	HW_REV1,
@@ -109,9 +107,8 @@ static void print_hw_info(void)
 
 	printf("HW:    %s | REV%04x\n", hw_ver_tbl[hw_ver], hw_rev_tbl[hw_rev]);
 };
-#endif
 
-#if defined(CONFIG_OF_BOARD_SETUP) && !defined(CONFIG_SPL_BUILD)
+#if defined(CONFIG_OF_BOARD_SETUP)
 static int em4xx_set_revision(void *blob)
 {
 	unsigned int hw_rev;
@@ -168,7 +165,6 @@ static void setup_fec(void)
 
 int board_init(void)
 {
-#if !defined(CONFIG_SPL_BUILD)
 	struct udevice *status_led;
 
 	if (led_get_by_label("energymanager:red:status", &status_led) == 0)
@@ -176,7 +172,7 @@ int board_init(void)
 
 	tq_board_gpio_init(em4xx_gid, ARRAY_SIZE(em4xx_gid));
 	print_hw_info();
-#endif
+
 	return 0;
 }
 
@@ -202,7 +198,6 @@ static int print_bootinfo(void)
 	return 0;
 }
 
-#if !defined(CONFIG_SPL_BUILD)
 static bool has_usb(void)
 {
 	return dm_gpio_get_value(&em4xx_gid[HW_VER3].desc);
@@ -303,12 +298,9 @@ int board_phy_config(struct phy_device *phydev)
 
 	return 0;
 }
-#endif
 
 int board_late_init(void)
 {
-#if !defined(CONFIG_SPL_BUILD)
-
 	adjust_env();
 
 	/* power-on reset on rtc is sometimes incomplete and leave corrupted registers */
@@ -320,7 +312,6 @@ int board_late_init(void)
 	tq_pcf85063_adjust_capacity(0, 0x51, 12500);
 	tq_pcf85063_set_clkout(0, 0x51, TQ_PCF85063_CLKOUT_OFF);
 	tq_pcf85063_set_offset(0, 0x51, true, 5);
-#endif
 
 	return 0;
 }
