@@ -15,7 +15,7 @@
 
 #define BB_ENV_SETTINGS \
 	"console=" CONSOLE_DEV "," __stringify(CONFIG_BAUDRATE)  "\0" \
-	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0"
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
 /* Initial environment variables */
 /* TODO: Environment unification/variable renaming of em310/em4xx
@@ -65,7 +65,7 @@
 	"mmcpart=1\0" \
 	"unzipimage=unzip ${fdt_addr} ${loadaddr}\0" \
 	"loadimage=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${image}\0" \
-	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${fdtfile}\0" \
+	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"setenv bootargs; " \
 		"run mmcargs; " \
@@ -80,7 +80,7 @@
 		"run set_getcmd; " \
 		"${get_cmd} ${fdt_addr} ${hwtype}/${image} && " \
 		"run unzipimage && " \
-		"${get_cmd} ${fdt_addr} ${hwtype}/${fdtfile} && " \
+		"${get_cmd} ${fdt_addr} ${hwtype}/${fdt_file} && " \
 		"echo 'Loaded kernel and device tree via tftp' && " \
 		"booti ${loadaddr} - ${fdt_addr}\0" \
 	"set_getcmd=if test \"${ipmode}\" != static; then "                    \

@@ -220,7 +220,7 @@ static void adjust_env(void)
 	 * later.
 	 */
 	if ((strcmp(CONFIG_DEFAULT_FDT_FILE, "imx8mn-em4xx-u.dtb") != 0) || has_usb())
-		env_set("fdtfile", CONFIG_DEFAULT_FDT_FILE);
+		env_set("fdt_file", CONFIG_DEFAULT_FDT_FILE);
 	else
 		em4xx_lan_detected = true;
 
@@ -294,7 +294,7 @@ int board_phy_config(struct phy_device *phydev)
 	}
 
 	if (em4xx_lan_detected && fdtfile)
-		env_set("fdtfile", fdtfile);
+		env_set("fdt_file", fdtfile);
 
 	return 0;
 }
