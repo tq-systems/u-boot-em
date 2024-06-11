@@ -20,11 +20,13 @@
 	leds {
 		bootph-all;
 
-		status_green {
+		led-status-green {
 			/delete-property/ linux,default-trigger;
+			default-state = "on";
+			bootph-all;
 		};
 
-		status_red {
+		led-status-red {
 			default-state = "on";
 			bootph-all;
 		};
