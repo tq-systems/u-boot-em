@@ -143,13 +143,7 @@ static void mxs_mem_init_clock(void)
 {
 	struct mxs_clkctrl_regs *clkctrl_regs =
 		(struct mxs_clkctrl_regs *)MXS_CLKCTRL_BASE;
-#if defined(CONFIG_MX23)
-	/* Fractional divider for ref_emi is 33 ; 480 * 18 / 33 = 266MHz */
-	const unsigned char divider = 33;
-#elif defined(CONFIG_MX28)
-	/* Fractional divider for ref_emi is 21 ; 480 * 18 / 21 = 411MHz */
-	const unsigned char divider = 21;
-#endif
+	const unsigned char divider = CONFIG_SPL_MXS_REF_EMI_DIV;
 
 	debug("SPL: Initialising FRAC0\n");
 
@@ -167,7 +161,6 @@ static void mxs_mem_init_clock(void)
 
 	early_delay(11000);
 
-	/* Set EMI clock divider for EMI clock to 411 / 2 = 205MHz */
 	writel((2 << CLKCTRL_EMI_DIV_EMI_OFFSET) |
 		(1 << CLKCTRL_EMI_DIV_XTAL_OFFSET),
 		&clkctrl_regs->hw_clkctrl_emi);
