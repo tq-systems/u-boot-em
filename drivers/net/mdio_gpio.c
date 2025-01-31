@@ -298,6 +298,7 @@ static int mdio_gpio_probe(struct udevice *mdio_dev)
 
 static const struct udevice_id mdio_gpio_ids[] = {
 	{ .compatible = "virtual,mdio-gpio" },
+	{ .compatible = "microchip,mdio-smi0"},
 	{ /* sentinel */ }
 };
 
