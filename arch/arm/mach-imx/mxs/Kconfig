@@ -47,6 +47,11 @@ config TARGET_XEA
 	bool "Support XEA"
 	select PL01X_SERIAL
 
+config TARGET_EM310
+	bool "Support em310"
+	select PL01X_SERIAL
+	select BOARD_EARLY_INIT_F
+
 endchoice
 
 config SYS_SOC
@@ -81,5 +86,6 @@ config SPL_MXS_REF_EMI_DIV
 
 source "board/freescale/mx28evk/Kconfig"
 source "board/liebherr/xea/Kconfig"
+source "board/tq/em310/Kconfig"
 
 endif
