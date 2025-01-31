@@ -29,9 +29,13 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 #include <linux/mdio.h>
+#include <netdev.h>
 
 #define MDIO_READ 2
 #define MDIO_WRITE 1
+
+#define SMI_READ_WRITE_OP 0x00
+#define SMI_KSZ88XX_READ_PHY	BIT(4)
 
 #define MDIO_C45 BIT(15)
 #define MDIO_C45_ADDR (MDIO_C45 | 0)
@@ -250,6 +254,61 @@ static int mdio_gpio_write(struct udevice *mdio_dev, int addr, int devad, int re
 	mdio_gpio_send_bit(mdio_dev, 0);
 
 	mdio_gpio_send_num(mdio_dev, val, 16);
+
+	mdio_dir(mdio_dev, 0);
+	mdio_gpio_get_bit(mdio_dev);
+
+	return 0;
+}
+
+/* Serial Management Interface (SMI) uses the following frame format:
+ *
+ *       preamble|start|Read/Write|  PHY   |  REG  |TA|   Data bits      | Idle
+ *               |frame| OP code  |address |address|  |                  |
+ * read | 32x1´s | 01  |    00    | 1xRRR  | RRRRR |Z0| 00000000DDDDDDDD |  Z
+ * write| 32x1´s | 01  |    00    | 0xRRR  | RRRRR |10| xxxxxxxxDDDDDDDD |  Z
+ *
+ */
+u8 mdio_gpio_read_smi(struct mii_dev *bus, int reg)
+{
+	struct udevice *mdio_dev = bus->priv;
+	u8 ret;
+	int i;
+
+	mdio_gpio_cmd(mdio_dev, SMI_READ_WRITE_OP,
+		      ((reg & 0xE0) >> 5) | SMI_KSZ88XX_READ_PHY, reg & 0x1F);
+
+	mdio_dir(mdio_dev, 0);
+
+	/* check the turnaround bit: the PHY should be driving it to zero.
+	 */
+	if (mdio_gpio_get_bit(mdio_dev) != 0) {
+		/* PHY didn't drive TA low -- flush any bits it
+		 * may be trying to send.
+		 */
+		for (i = 0; i < 32; i++)
+			mdio_gpio_get_bit(mdio_dev);
+
+		return 0xff;
+	}
+
+	ret = mdio_gpio_get_num(mdio_dev, 16) & 0xff;
+	mdio_gpio_get_bit(mdio_dev);
+
+	return ret;
+}
+
+int mdio_gpio_write_smi(struct mii_dev *bus, int reg, u8 val)
+{
+	struct udevice *mdio_dev = bus->priv;
+
+	mdio_gpio_cmd(mdio_dev, SMI_READ_WRITE_OP, (reg & 0xE0) >> 5, reg & 0x1F);
+
+	/* send the turnaround (10) */
+	mdio_gpio_send_bit(mdio_dev, 1);
+	mdio_gpio_send_bit(mdio_dev, 0);
+
+	mdio_gpio_send_num(mdio_dev, val & 0xff, 16);
 
 	mdio_dir(mdio_dev, 0);
 	mdio_gpio_get_bit(mdio_dev);
