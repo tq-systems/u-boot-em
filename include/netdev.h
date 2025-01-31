@@ -131,4 +131,9 @@ struct eth_device;
 int fecmxc_register_mii_postcall(struct eth_device *dev, int (*cb)(int));
 #endif
 
+#ifdef CONFIG_MDIO_GPIO_BITBANG
+int mdio_gpio_write_smi(struct mii_dev *mdio_dev, int reg, u8 value);
+u8 mdio_gpio_read_smi(struct mii_dev *mdio_dev, int reg);
+#endif
+
 #endif /* _NETDEV_H_ */
