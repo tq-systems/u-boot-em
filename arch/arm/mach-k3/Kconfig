@@ -169,5 +169,6 @@ source "arch/arm/mach-k3/j721e/Kconfig"
 source "arch/arm/mach-k3/j721s2/Kconfig"
 source "arch/arm/mach-k3/j722s/Kconfig"
 source "arch/arm/mach-k3/j784s4/Kconfig"
+source "board/tq/em-cb30/Kconfig"
 
 endif

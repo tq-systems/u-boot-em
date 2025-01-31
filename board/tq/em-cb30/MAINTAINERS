@@ -1,0 +1,7 @@
+TQ-SYSTEMS EM-CB30
+L:	u-boot@ew.tq-group.com
+S:	Maintained
+F:	arch/arm/dts/k3-am62*-em-cb30*.dts*
+F:	board/tq/em-cb30/
+F:	configs/EM-CB30*_defconfig
+F:	include/configs/em-cb30.h
