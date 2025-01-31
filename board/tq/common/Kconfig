@@ -1,0 +1,3 @@
+config TQ_RTC
+	bool
+	depends on DM_I2C
