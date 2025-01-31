@@ -1,0 +1,16 @@
+U-Boot on a EM4xx
+=================
+
+The EM4xx (or Energymanager 4xx) is based on i.MX8MN processor by NXP.
+
+Compiling U-Boot for EM4xx
+--------------------------
+
+clean up:
+	$ make mrproper
+
+configure:
+	$ make imx8mn_em4xx_cb_defconfig
+
+compile:
+	$ make all
