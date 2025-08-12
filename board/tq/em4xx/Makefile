@@ -10,4 +10,5 @@ else
 obj-y += spl.o
 obj-$(CONFIG_IMX8MN_EM4XX_MEMORY_512M) += em4xx-512mb-lpddr4_timing.o
 obj-$(CONFIG_IMX8MN_EM4XX_MEMORY_1G) += em4xx-1gb-lpddr4_timing.o
+obj-$(CONFIG_IMX8MN_EM4XX_MEMORY_2G) += em4xx-2gb-lpddr4_timing.o
 endif

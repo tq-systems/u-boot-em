@@ -40,6 +40,11 @@ choice
 	prompt "EM4xx RAM size selection"
 	default IMX8MN_EM4XX_MEMORY_1G
 
+config IMX8MN_EM4XX_MEMORY_2G
+	bool "2 GiB"
+	help
+		Select this option if the board has 2 GiB of RAM
+
 config IMX8MN_EM4XX_MEMORY_1G
 	bool "1 GiB"
 	help

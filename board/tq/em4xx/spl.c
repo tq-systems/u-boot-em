@@ -40,7 +40,11 @@ static void spl_dram_init(void)
 	struct dram_timing_info *timing;
 	long size = PHYS_SDRAM_SIZE;
 
-#if IS_ENABLED(CONFIG_IMX8MN_EM4XX_MEMORY_1G)
+#if IS_ENABLED(CONFIG_IMX8MN_EM4XX_MEMORY_2G)
+	extern struct dram_timing_info em4xx_2gb_lpddr4_timing;
+
+	timing = &em4xx_2gb_lpddr4_timing;
+#elif IS_ENABLED(CONFIG_IMX8MN_EM4XX_MEMORY_1G)
 	extern struct dram_timing_info em4xx_1gb_lpddr4_timing;
 
 	timing = &em4xx_1gb_lpddr4_timing;
