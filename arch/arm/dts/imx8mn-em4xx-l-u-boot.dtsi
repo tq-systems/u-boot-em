@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (c) 2023-2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Nora Schiffer
+ */
+
+#include "imx8mn-em4xx-u-boot.dtsi"
+
+/ {
+	/* Using this dt for both LAN variants - hence use common name */
+	model = "TQ-Systems EM4XX-CB-L";
+};
