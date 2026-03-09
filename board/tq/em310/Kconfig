@@ -1,0 +1,28 @@
+if TARGET_EM310
+
+config SYS_BOARD
+	default "em310"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_SOC
+	default "mxs"
+
+config SYS_CONFIG_NAME
+	default "em310"
+
+config SYS_MXS_VDD5V_ONLY
+	def_bool y
+
+config EM310_DEFAULTS
+	bool
+	default y
+	select TQ_RTC
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select MDIO_GPIO_BITBANG
+
+source "board/tq/common/Kconfig"
+
+endif
