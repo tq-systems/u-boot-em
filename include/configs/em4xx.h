@@ -60,8 +60,8 @@
 			"setenv BOOT_1_LEFT 3; setenv BOOT_2_LEFT 3; " \
 			"saveenv; reset; " \
 		"fi\0" \
-	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
-	"mmcblkdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
+	"mmcdev=" __stringify(CONFIG_ENV_MMC_DEVICE_INDEX) "\0" \
+	"mmcblkdev=" __stringify(CONFIG_ENV_MMC_DEVICE_INDEX) "\0" \
 	"mmcpart=1\0" \
 	"unzipimage=unzip ${fdt_addr} ${loadaddr}\0" \
 	"loadimage=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} boot/${image}\0" \
