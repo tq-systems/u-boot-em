@@ -10,6 +10,7 @@
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
+#include <configs/em_set_bootsys.h>
 
 #define CONSOLE_DEV			"ttymxc0"
 
@@ -87,6 +88,7 @@
 
 #define CFG_EXTRA_ENV_SETTINGS		\
 	EG4XX_ENV_SETTINGS		\
+	EM_SET_BOOTSYS			\
 	BB_ENV_SETTINGS
 
 #endif /* __EG4XX_H */

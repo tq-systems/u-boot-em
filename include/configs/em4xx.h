@@ -10,6 +10,7 @@
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
+#include <configs/em_set_bootsys.h>
 
 #define CONSOLE_DEV			"ttymxc0"
 
@@ -27,39 +28,6 @@
 	"image=Image.gz\0" \
 	"loadaddr=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
 	"fdt_addr=0x46480000\0" \
-	"BOOT_1_LEFT=3\0" \
-	"BOOT_2_LEFT=3\0" \
-	"BOOT_ORDER=1 2\0" \
-	"raucslot=1\0" \
-	"set_bootsys=echo Setting booting system; " \
-		"setenv boot; " \
-		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
-			"if test ! -n ${boot} && test x${BOOT_SLOT} = x1; then " \
-				"if test ${BOOT_1_LEFT} -gt 0; then " \
-					"setexpr BOOT_1_LEFT ${BOOT_1_LEFT} - 1; " \
-					"echo Found valid slot 1, ${BOOT_1_LEFT} attempts remaining; " \
-					"setenv mmcpart 2; " \
-					"setenv raucslot 1; " \
-					"setenv boot 1; " \
-				"fi; " \
-			"fi; " \
-			"if test ! -n ${boot} && test x${BOOT_SLOT} = x2; then " \
-				"if test ${BOOT_2_LEFT} -gt 0 ; then " \
-					"setexpr BOOT_2_LEFT ${BOOT_2_LEFT} - 1; " \
-					"echo Found valid slot 2, ${BOOT_2_LEFT} attempts remaining; " \
-					"setenv mmcpart 3; " \
-					"setenv raucslot 2; " \
-					"setenv boot 1; " \
-				"fi; " \
-			"fi; " \
-		"done; " \
-		"setenv boot; " \
-		"saveenv; " \
-		"if test ${BOOT_1_LEFT} -eq 0 && test ${BOOT_2_LEFT} -eq 0; then " \
-			"echo No boot tries left, resetting tries to 3; " \
-			"setenv BOOT_1_LEFT 3; setenv BOOT_2_LEFT 3; " \
-			"saveenv; reset; " \
-		"fi\0" \
 	"mmcdev=" __stringify(CONFIG_ENV_MMC_DEVICE_INDEX) "\0" \
 	"mmcblkdev=" __stringify(CONFIG_ENV_MMC_DEVICE_INDEX) "\0" \
 	"mmcpart=1\0" \
@@ -107,8 +75,8 @@
 /* Link Definitions */
 #define CFG_SYS_INIT_RAM_ADDR	0x40000000
 #define CFG_SYS_INIT_RAM_SIZE	0x80000
-#define CFG_SYS_SDRAM_BASE		0x40000000
-#define PHYS_SDRAM			0x40000000
+#define CFG_SYS_SDRAM_BASE	0x40000000
+#define PHYS_SDRAM		0x40000000
 
 /* Minimum size - only used during init */
 #if IS_ENABLED(CONFIG_IMX8MN_EM4XX_MEMORY_1G)
@@ -121,6 +89,7 @@
 
 #define CFG_EXTRA_ENV_SETTINGS		\
 	EM4XX_ENV_SETTINGS		\
+	EM_SET_BOOTSYS			\
 	BB_ENV_SETTINGS
 
 #endif /* __EM4XX_H */
