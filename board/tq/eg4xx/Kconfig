@@ -51,6 +51,8 @@ config IMX8MN_EG4XX_DEFAULTS
 	bool
 	default y
 	select ARCH_MISC_INIT
+	select TQ_BDI
+	select TQ_ETH
 	select TQ_RTC
 	select CMD_FUSE
 	select BOARD_LATE_INIT

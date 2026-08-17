@@ -56,6 +56,8 @@ config IMX8MN_EM4XX_DEFAULTS
 	bool
 	default y
 	select ARCH_MISC_INIT
+	select TQ_BDI
+	select TQ_ETH
 	select TQ_RTC
 	select CMD_FUSE
 	select BOARD_LATE_INIT
@@ -104,6 +106,7 @@ config IMX8MN_EM4XX_DEFAULTS
 	select FEC_MXC
 	select PHYLIB
 	select PHY_FIXED
+	select DM_MDIO
 	select USB
 	select DM_USB
 	select USB_EHCI_HCD

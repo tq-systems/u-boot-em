@@ -4,8 +4,11 @@
  * Authors: Markus Niebel, Nora Schiffer
  */
 
-#ifndef __TQ_RTC__
-#define __TQ_RTC__
+#ifndef __TQ_RTC_H__
+#define __TQ_RTC_H__
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define TQ_PCF85063_CLKOUT_OFF 0x07
 

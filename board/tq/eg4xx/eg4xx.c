@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (c) 2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
- * D-82229 Seefeld, Germany.
- * Author: Paul Gerber
+ * Copyright (c) 2026 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany. All rights reserved.
+ * Author: Paul Gerber, Michael Krummsdorf
  */
 
 #include <asm/arch/sys_proto.h>
 #include <asm-generic/gpio.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/global_data.h>
+#include <asm/mach-imx/boot_mode.h>
+#include <dm/uclass.h>
 #include <env.h>
 #include <led.h>
 #include <linux/delay.h>
@@ -18,9 +18,9 @@
 #include <miiphy.h>
 #include <phy.h>
 
+#include "../common/tq_bdi.h"
+#include "../common/tq_eth.h"
 #include "../common/tq_rtc.h"
-
-DECLARE_GLOBAL_DATA_PTR;
 
 static int is_factory_button_pressed(void)
 {
@@ -77,23 +77,30 @@ int board_init(void)
 	return 0;
 }
 
-static int print_bootinfo(void)
+
+#define MICREL_PHY_ID 0x00221430
+int board_phy_config(struct phy_device *phydev)
 {
-	enum boot_device bt_dev;
+	int ret;
+	u32 id;
 
-	bt_dev = get_boot_device();
+	tq_eth_setup_fec();
 
-	puts("Boot:  ");
-	switch (bt_dev) {
-	case MMC3_BOOT:
-		puts("MMC\n");
-		break;
-	case USB_BOOT:
-		puts("USB\n");
-		break;
-	default:
-		printf("Unknown/Unsupported device %u\n", bt_dev);
-		break;
+	ret = tq_eth_probe_mdio_bus(phydev);
+	if (ret)
+		return ret;
+
+	/* Identify switch chip as A or B */
+	/* (A) Micrel KSZ8863 by reading PHY ID register, addr 0x3 reg 0x2..0x3 */
+	ret = get_phy_id(phydev->bus, 0x3, MDIO_DEVAD_NONE, &id);
+	if (!ret && id == MICREL_PHY_ID) {
+		printf("Found Micrel PHY ID: %x\n", id);
+
+		ret = tq_eth_configure_micrel_switch(phydev);
+		if (ret)
+			return ret;
+	} else {
+		printf("No switch found.\n");
 	}
 
 	return 0;
@@ -102,8 +109,7 @@ static int print_bootinfo(void)
 int board_late_init(void)
 {
 	if (is_usb_boot()) {
-		env_set("bootcmd", "run fastbootcmd");
-		env_set("bootdelay", "0");
+		env_set("bootdelay", "-1");
 	}
 
 	/* set quartz load to 12500 femtofarads */
@@ -116,6 +122,6 @@ int board_late_init(void)
 
 int checkboard(void)
 {
-	print_bootinfo();
+	tq_bdi_print_bootinfo();
 	return 0;
 }
