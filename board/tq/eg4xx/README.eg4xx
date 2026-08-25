@@ -1,0 +1,16 @@
+U-Boot on a EG4xx
+=================
+
+The EG4xx (or Energy Gateway 4xx) is based on i.MX8MN processor by NXP.
+
+Compiling U-Boot for EG4xx
+--------------------------
+
+clean up:
+	$ make mrproper
+
+configure:
+	$ make imx8mn_eg4xx_512m_defconfig
+
+compile:
+	$ make all

@@ -1,0 +1,174 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+* Copyright (c) 2026 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany. All rights reserved.
+* Author: Paul Gerber, Michael Krummsdorf
+*/
+
+#include "imx8mn-u-boot.dtsi"
+
+/ {
+	leds {
+		led1-gn {
+			default-state = "on";
+		};
+
+		led1-rd {
+			default-state = "on";
+		};
+	};
+
+	/*
+	 * sysinfo is not marked as bootph-all - we don't want
+	 * early show_board_info() to use this info
+	 */
+	sysinfo-ver {
+		compatible = "gpio-sysinfo";
+		no-floating-pins;
+		gpios =
+			<&gpio4 25 GPIO_ACTIVE_HIGH>, /* HW.VER3 */
+			<&gpio4 24 GPIO_ACTIVE_HIGH>, /* HW.VER2 */
+			<&gpio4 23 GPIO_ACTIVE_HIGH>, /* HW.VER1 */
+			<&gpio4 22 GPIO_ACTIVE_HIGH>, /* HW.VER0 */
+			<&gpio1 0 GPIO_ACTIVE_HIGH>; /* IS_EG4XX */
+
+		revisions = <0x10>, <0x11>, <0x00>, <0x01>, <0x02>, <0x08>, <0x09>, <0x0a>, <0x0b>, <0x0c>, <0x0d>, <0x0f>;
+		names = "EG4XX-L-Ax",
+			"EG4XX-LL-Ax",
+			"EM4XX-CB-LLRR",
+			"EM4XX-L-CB-LRR",
+			"EM4XX-L-CB-LL",
+			"EM4XX-CB-ULRR",
+			"EM4XX-CB-URR",
+			"EM4XX-CB-LRR",
+			"EM4XX-CB-UL",
+			"EM4XX-CB-U",
+			"EM4XX-CB-L",
+			"EEBUS-GW-L";
+	};
+
+	sysinfo-rev {
+		compatible = "gpio-sysinfo";
+		no-floating-pins;
+		gpios =
+			<&gpio4 27 GPIO_ACTIVE_HIGH>, /* HW.REV0 */
+			<&gpio4 28 GPIO_ACTIVE_HIGH>, /* HW.REV1 */
+			<&gpio4 30 GPIO_ACTIVE_HIGH>; /* HW.REV2 */
+
+		revisions = <0x00>, <0x01>, <0x02>, <0x03>, <0x04>, <0x05>, <0x06>, <0x07>;
+		names = "0100", "0101", "0200", "0201", "0202", "0203", "0204", "0205";
+	};
+};
+
+&binman_imx_fit {
+	images {
+		fdt-1 {
+			description = "fdt-1";
+			type = "flat_dt";
+			compression = "none";
+			blob {
+				filename = "arch/arm/dts/imx8mn-eg4xx.dtb";
+			};
+		};
+	};
+
+	configurations {
+		default = "conf-1";
+
+		conf-1 {
+			description = "imx8mn-eg4xx";
+			firmware = "uboot";
+			loadables = "atf";
+			fdt = "fdt-1";
+		};
+	};
+};
+
+&fec1 {
+	/* U-Boot network as fixed-link, use generic reset */
+	phy-reset-gpios = <&gpio1 28 GPIO_ACTIVE_LOW>;
+	phy-reset-duration = <10>;
+	phy-reset-post-delay = <100>;
+};
+
+&gpio1 {
+	bootph-pre-ram;
+};
+
+&gpio2 {
+	bootph-pre-ram;
+};
+
+&gpio3 {
+	bootph-pre-ram;
+};
+
+&gpio4 {
+	pinctrl-0 = <&pinctrl_gpio4 &pinctrl_gpiobutton>;
+
+	bootph-pre-ram;
+	/delete-node/ hw-ver-0-hog;
+	/delete-node/ hw-ver-1-hog;
+	/delete-node/ hw-ver-2-hog;
+	/delete-node/ hw-ver-3-hog;
+	/delete-node/ hw-rev-0-hog;
+	/delete-node/ hw-rev-1-hog;
+	/delete-node/ hw-rev-2-hog;
+
+	factory-dflt-n {
+		gpio-hog;
+		gpios = <31 GPIO_ACTIVE_LOW>;
+		input;
+	};
+};
+
+&gpio5 {
+	bootph-pre-ram;
+};
+
+&i2c1 {
+	bootph-pre-ram;
+};
+
+&pca9450 {
+	bootph-pre-ram;
+
+	regulators {
+		bootph-pre-ram;
+	};
+};
+
+&pinctrl_i2c1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_pmic {
+	bootph-pre-ram;
+};
+
+&pinctrl_uart1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc3 {
+	bootph-pre-ram;
+};
+
+&pinctrl_wdog {
+	bootph-pre-ram;
+};
+
+&uart1 {
+	bootph-pre-ram;
+};
+
+&usbotg1 {
+	dr_mode = "peripheral";
+	disable-over-current;
+	status = "okay";
+};
+
+&usdhc3 {
+	bootph-pre-ram;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+};
