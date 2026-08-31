@@ -1,19 +1,19 @@
-if TARGET_IMX8MN_EM4XX
+if TARGET_IMX8MN_EG4XX
 
 config SYS_BOARD
-	default "em4xx"
+	default "eg4xx"
 
 config SYS_VENDOR
 	default "tq"
 
 config SYS_CONFIG_NAME
-	default "em4xx"
+	default "eg4xx"
 
 config DEFAULT_DEVICE_TREE
-	default "imx8mn-em4xx-u"
+	default "imx8mn-eg4xx"
 
 config DEFAULT_FDT_FILE
-	default "imx8mn-em4xx-u.dtb"
+	default "imx8mn-eg4xx.dtb"
 
 config NR_DRAM_BANKS
 	default 1
@@ -28,31 +28,26 @@ config FIT_EXTERNAL_OFFSET
 	default 0x3000
 
 config IMX_CONFIG
-	default "board/tq/em4xx/imximage.cfg"
+	default "board/tq/eg4xx/imximage.cfg"
 
-config IMX8MN_EM4XX_HWTYPE
+config IMX8MN_EG4XX_HWTYPE
 	string "Environment variable 'hwtype'"
-	default "em4xx"
+	default "eg4xx"
 	help
 		Environment variable 'hwtype' used for tftp directory in boot_net
 
 choice
-	prompt "EM4xx RAM size selection"
-	default IMX8MN_EM4XX_MEMORY_1G
+	prompt "EG4xx RAM size selection"
+	default IMX8MN_EG4XX_MEMORY_512M
 
-config IMX8MN_EM4XX_MEMORY_1G
-	bool "1 GiB"
-	help
-		Select this option if the board has 1 GiB of RAM
-
-config IMX8MN_EM4XX_MEMORY_512M
+config IMX8MN_EG4XX_MEMORY_512M
 	bool "512 MiB"
 	help
 		Select this option if the board has 512 MiB of RAM
 
 endchoice
 
-config IMX8MN_EM4XX_DEFAULTS
+config IMX8MN_EG4XX_DEFAULTS
 	bool
 	default y
 	select ARCH_MISC_INIT
@@ -113,8 +108,8 @@ config IMX8MN_EM4XX_DEFAULTS
 	select MXC_USB_OTG_HACTIVE
 	select MDIO_GPIO_BITBANG
 
-config IMX8MN_EM4XX_UUU_SUPPORT
-	bool "EM4XX UUU SUPPORT"
+config IMX8MN_EG4XX_UUU_SUPPORT
+	bool "EG4XX UUU SUPPORT"
 	select USB_GADGET
 	select CI_UDC
 	select USB_FUNCTION_SDP
@@ -126,7 +121,7 @@ config IMX8MN_EM4XX_UUU_SUPPORT
 	select SPL_USB_GADGET
 	select SPL_IMX_ROMAPI_SUPPORT
 
-if IMX8MN_EM4XX_UUU_SUPPORT
+if IMX8MN_EG4XX_UUU_SUPPORT
 
 config USB_GADGET_MANUFACTURER
 	default "FSL"

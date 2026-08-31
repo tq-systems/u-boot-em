@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (c) 2023 - 2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * Copyright (c) 2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
- * Author: Michael Krummsdorf
+ * Author: Paul Gerber
  */
 
-#ifndef __EM4XX_H
-#define __EM4XX_H
+#ifndef __EG4XX_H
+#define __EG4XX_H
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
@@ -18,13 +18,8 @@
 	"console=" CONSOLE_DEV "," __stringify(CONFIG_BAUDRATE)  "\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
-/* Initial environment variables */
-/* TODO: Environment unification/variable renaming of em310/em4xx
- *       must be able to handle saved envs on field devices.
- *       We will take care of that step at a later date.
- */
-#define EM4XX_ENV_SETTINGS \
-	"hwtype=" CONFIG_IMX8MN_EM4XX_HWTYPE "\0" \
+#define EG4XX_ENV_SETTINGS \
+	"hwtype=" CONFIG_IMX8MN_EG4XX_HWTYPE "\0" \
 	"image=Image.gz\0" \
 	"loadaddr=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
 	"fdt_addr=0x46480000\0" \
@@ -63,13 +58,19 @@
 		"rootwait "                                                    \
 		"rauc.slot=${raucslot}\0"                                      \
 	"mmcargs=run addtty addmmc\0"                                          \
-	"netargs=run addtty\0"                                    \
+	"netargs=run addtty\0"                                                 \
 	"netconsole=echo Starting netconsole...; "                             \
 		"setenv ncip ${serverip}; "                                    \
 		"setenv stderr nc; setenv stdout nc; setenv stdin nc\0"        \
 	"serialconsole=setenv stderr serial; setenv stdout serial; setenv stdin serial; " \
 		"setenv ncip\0"                                                \
 	"ipmode=static\0"                                                      \
+	"fastbootcmd=echo Running fastboot mode; fastboot usb 0\0" \
+	"fastboot_partition_alias_all=" \
+		__stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) ".0:0\0" \
+	"fastboot_partition_alias_bootloader=" \
+		__stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) ".1:0\0" \
+	"emmc_dev=" __stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) "\0" \
 	""
 
 /* Link Definitions */
@@ -79,17 +80,15 @@
 #define PHYS_SDRAM		0x40000000
 
 /* Minimum size - only used during init */
-#if IS_ENABLED(CONFIG_IMX8MN_EM4XX_MEMORY_1G)
-#define PHYS_SDRAM_SIZE		SZ_1G
-#elif IS_ENABLED(CONFIG_IMX8MN_EM4XX_MEMORY_512M)
+#if IS_ENABLED(CONFIG_IMX8MN_EG4XX_MEMORY_512M)
 #define PHYS_SDRAM_SIZE		SZ_512M
 #else
 # error "No RAM timing configured"
 #endif
 
 #define CFG_EXTRA_ENV_SETTINGS		\
-	EM4XX_ENV_SETTINGS		\
+	EG4XX_ENV_SETTINGS		\
 	EM_SET_BOOTSYS			\
 	BB_ENV_SETTINGS
 
-#endif /* __EM4XX_H */
+#endif /* __EG4XX_H */

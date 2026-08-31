@@ -1,3 +1,9 @@
+config TQ_BDI
+	bool
+
+config TQ_ETH
+	bool
+
 config TQ_RTC
 	bool
 	depends on DM_I2C
