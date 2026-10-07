@@ -87,11 +87,11 @@ int board_phy_config(struct phy_device *phydev)
 	u32 id;
 	char *fdtfile = NULL;
 
+	tq_eth_setup_fec();
+
 	/* No switch in USB variant */
 	if (has_usb())
 		return 0;
-
-	tq_eth_setup_fec();
 
 	ret = tq_eth_probe_mdio_bus(phydev);
 	if (ret)
